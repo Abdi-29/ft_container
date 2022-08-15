@@ -6,15 +6,16 @@
 namespace ft {
 	template < class T, class Alloc = std::allocator<T> >
 	class Vector {
-	public:
-		Vector() : _size(0), _capacity(0){ }
-
+        typedef T value_type;
 	private:
+        T *_array;
 		size_t _size;
 		size_t _capacity;
+	public:
+		Vector() : _size(0), _capacity(0) { }
 
 	public:
-		//capacity
+        //capacity
 		bool empty() {
 			return size() == 0;
 		}
@@ -42,6 +43,15 @@ namespace ft {
 		{
 			_size = n;
 		}
+
+        //modifiers
+    public:
+        void push_back(const value_type& value) {
+            _array  = new value_type (7);
+            _array[0] = value;
+        }
+        //TODO implement the beging and end function so you can test the push_back function
+        //TODO resize function to finish and do more testing
 	};
 }
 #endif
