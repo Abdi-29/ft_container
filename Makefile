@@ -1,12 +1,13 @@
 NAME = ft_container
 
-SRC = 	srcs/main.cpp
+SRC = 	test/test_capacity.cpp \
+		test/catch_amalgamated.cpp
 
 INCLUDE = -I ./includes
 OBJ = $(SRC:%.cpp=%.o)
 
 
-CFLAGS = -Wall -Werror -Wextra -std=c++98 #-g -fsanitize=address
+CFLAGS = -Wall -std=c++17 #-g -fsanitize=address
 
 all: build
 

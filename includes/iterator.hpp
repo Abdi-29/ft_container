@@ -44,6 +44,8 @@ namespace ft {
 			return *this;
 		}
 
+		Iterator operator-(const Iterator& other) { return this->_data - other._data; }
+		Iterator operator+(const Iterator& other) { return this->_data + other._data; }
 		Iterator operator+=(int) { return operator++(); }
 		Iterator operator+(int a) { return _data + a; }
 		Iterator operator-=(int) { return operator--(); }

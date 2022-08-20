@@ -1,6 +1,5 @@
-#include "../includes/vector.hpp"
-#include "catch.hpp"
 #include <vector>
+#include "vector.hpp"
 
 TEST_CASE( "vectors can be sized and resized", "[vector]" ) {
 
@@ -8,7 +7,6 @@ TEST_CASE( "vectors can be sized and resized", "[vector]" ) {
 
 std::vector<int> v;
 ft::Vector<int> mine;
-
 std::vector<int>::iterator Iv;
 ft::Vector<int>::iterator	Imine;
 
