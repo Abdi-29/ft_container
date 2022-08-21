@@ -1,52 +1,76 @@
 #include <vector>
 #include "vector.hpp"
 
-TEST_CASE( "vectors can be sized and resized", "[vector]" ) {
-
-// For each section, vector v is anew:
-
-std::vector<int> v;
-ft::Vector<int> mine;
-std::vector<int>::iterator Iv;
-ft::Vector<int>::iterator	Imine;
-
-for (size_t i = 0; i < 5; ++i) {
-	v.push_back(i + 5);
-	mine.push_back(i + 5);
-}
-Iv = v.begin();
-Imine = mine.begin();
-
-REQUIRE( v.size() == mine.size() );
-REQUIRE( v.capacity() == mine.capacity() );
-
-//SECTION( "resizing bigger changes size and capacity" ) {
-//v.resize( 10 );
-//
-//REQUIRE( v.size() == 10 );
-//REQUIRE( v.capacity() >= 10 );
-//}
-//SECTION( "resizing smaller changes size but not capacity" ) {
-//v.resize( 0 );
-//
-//REQUIRE( v.size() == 0 );
-//REQUIRE( v.capacity() >= 5 );
-//}
-//SECTION( "reserving bigger changes capacity but not size" ) {
-//v.reserve( 10 );
-//
-//REQUIRE( v.size() == 5 );
-//REQUIRE( v.capacity() >= 10 );
-//}
-//SECTION( "reserving smaller does not change size or capacity" ) {
-//v.reserve( 0 );
-//
-//REQUIRE( v.size() == 5 );
-//REQUIRE( v.capacity() >= 5 );
-//}
-}
-
 #define RED  "\x1B[31m"
-#define GRN  "\x1B[32m"
-#define RST  "\x1B[0m"
+#define GREEN  "\x1B[32m"
+#define YELLOW  "\x1B[33m"
+#define RESET  "\x1B[0m"
+
+#define ABBASSERT(message, expr) do { \
+	std::cout << YELLOW << (message) << RESET; \
+	if (expr) { \
+		std::cout << GREEN "pass\n" RESET; \
+	} else { \
+		std::cout << RED "fail\n" RESET; \
+	} \
+} while (0)
+
+template<typename T>
+void TestVector(std::vector<T> v, ft::Vector<T> mine) {
+	ABBASSERT("Vector Size: ", v.size() == mine.size());
+	std::cout << "vector " << v.size() << " and " << mine.size() << "\n";
+}
+
+template<typename T>
+void TestCapacity(std::vector<T> v, ft::Vector<T> mine) {
+	ABBASSERT("Vector Capacity: ", mine.capacity() >= v.capacity());
+	std::cout << "vector " << v.capacity() << " and " << mine.capacity() << "\n";
+}
+
+int main(void) {
+	ft::Vector<int> myvector;
+	std::vector<int> v;
+
+	for (size_t i = 0; i < 10; ++i) {
+		myvector.push_back(i);
+		v.push_back(i);
+	}
+	myvector.erase(myvector.begin() + 5);
+	v.erase(v.begin() + 5);
+
+	// erase the first 3 elements:
+
+	std::cout << "myvector contains:";
+	for (unsigned i=0; i<v.size(); ++i)
+		std::cout << ' ' << myvector[i] << " and " << v[i];
+	std::cout << '\n';
+
+//	TestVector(v, mine);
+//	TestCapacity(v, mine);
+//
+//	v.resize( 5 );
+//	mine.resize(5);
+//
+//	TestVector(v, mine);
+//	TestCapacity(v, mine);
+//
+//	mine.resize(8, 100);
+//	v.resize( 8, 100 );
+//
+//	TestVector(v, mine);
+//	TestCapacity(v, mine);
+//
+//	v.resize( 12 );
+//	mine.resize(12);
+//
+//	TestVector(v, mine);
+//	TestCapacity(v, mine);
+//
+//	TestVector(v, mine);
+//	for (size_t i = 0; i < mine.size(); ++i) {
+//		std::cout << " " << mine[i];
+//	}
+
+}
+
 

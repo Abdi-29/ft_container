@@ -1,7 +1,6 @@
 NAME = ft_container
 
-SRC = 	test/test_capacity.cpp \
-		test/catch_amalgamated.cpp
+SRC = 	srcs/main.cpp
 
 INCLUDE = -I ./includes
 OBJ = $(SRC:%.cpp=%.o)

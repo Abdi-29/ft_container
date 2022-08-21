@@ -14,6 +14,9 @@ namespace ft {
 	>
 
 	class Iterator {
+	public:
+		typedef size_t size_type;
+
 	protected:
 		Pointer _data;
 	public:
@@ -51,7 +54,8 @@ namespace ft {
 		Iterator operator-=(int) { return operator--(); }
 		Iterator operator-(int a) { return _data - a; }
 		Reference operator*() { return *_data; }
-		Reference operator[](int a) { return *(_data + a); }
+		Reference operator[](size_type n) const { return *(_data + n); }
+		Reference operator[](size_type n) { return *(_data + n); }
 		Pointer operator->() { return _data; }
 		bool operator==(const Iterator& other) { return (this->_data == other._data); }
 		bool operator!=(const Iterator<T> other) {return !(*this == other); }

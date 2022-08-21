@@ -3,6 +3,7 @@
 
 #include <iostream>
 #include "iterator.hpp"
+#include "util.hpp"
 
 namespace ft {
 	template < class T, class Allocator = std::allocator<T> >
@@ -11,7 +12,11 @@ namespace ft {
         typedef T value_type;
 		typedef Allocator allocator_type;
 		typedef  typename allocator_type::const_pointer	const_pointer;
-		typedef Iterator<T> iterator;
+//		typedef Iterator<T> iterator;
+		typedef  typename allocator_type::pointer pointer;
+		typedef pointer iterator;
+		typedef T& reference;
+		typedef const T& const_reference;
 		typedef const_pointer const_iterator;
 		typedef size_t size_type;
 
@@ -35,35 +40,70 @@ namespace ft {
 			}
 		}
 
+		~Vector() {
+			std::cerr << "IM HERE";
+		}
+
 	public:
+		reference operator[](size_type n) const { return *(_data + n); }
+		reference operator[](size_type n) { return *(_data + n); }
 		//capacity
 		bool empty() { return size() == 0; }
 		size_type	size() { return _size; }
 		size_type capacity() const { return _capacity; }
 
+		void _copy_(value_type *newData, size_type start, size_type end) {
+			for (size_type i = start; i < end; ++i) {
+				newData[i] = _data[i];
+			}
+		}
+
 		void reserve (size_type n) {
-			if (n > _capacity)
-				_capacity += n;
+			if (n <= _capacity)
+				return;
+			value_type	*newData;
+			newData = _alloc_.allocate(n);
+			_copy_(newData, 0, size());
+			_alloc_.deallocate(_data, size());
+			_data = newData;
+			_capacity = n;
 		}
 
 		iterator insert (iterator position, const value_type& val) {
 
 		}
+		reference back() { return _data[_size - 1]; }
+		const_reference back() const { return _data[_size - 1]; }
 
-//		void _allocation(size_type n) {
-//			for (size_type i = 0; i < n; ++i) {
-//
-//			}
-//		}
-
-		void resize(size_type n, value_type val = value_type()) {
-			std::cout << "test " << n << std::endl;
-			(void)val;
+		iterator erase(iterator position) {
+			iterator tmp = position;
+			for (iterator it = position; it != end(); ++it) {
+				it = tmp++;
+			}
+			_alloc_.destroy(&back());
+			return position;
 		}
-//		void resize(size_type n) { _size = n; }
+		void resize(size_type n, value_type val = value_type()) {
+			if (n < size()) {
+				_reduce_elements_(n);
+			} else if (n > size()) {
+				if (n > capacity()) {
+					reserve(ft::max(capacity() * 2, n));
+				}
+				for (size_type i = size(); i < n; ++i) {
+					_data[i] = val;
+				}
+				_size = n;
+			}
+		}
 
-	public:
-	//iterator
+		void _reduce_elements_(size_type n) {
+			for (size_type i = n; i < size(); ++i) {
+				_alloc_.destroy(&back());
+			}
+			_size = n;
+		}
+
 	public:
 		iterator end() { return iterator(&_data[_size]); }
 		iterator begin() { return iterator(_data); }
