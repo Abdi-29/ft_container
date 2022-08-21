@@ -45,14 +45,14 @@ int main(void) {
 		std::cout << ' ' << myvector[i] << " and " << v[i];
 	std::cout << '\n';
 
-//	TestVector(v, mine);
-//	TestCapacity(v, mine);
+	TestVector(v, myvector);
+	TestCapacity(v, myvector);
+
+	v.resize( 5 );
+	myvector.resize(5);
 //
-//	v.resize( 5 );
-//	mine.resize(5);
-//
-//	TestVector(v, mine);
-//	TestCapacity(v, mine);
+	TestVector(v, myvector);
+	TestCapacity(v, myvector);
 //
 //	mine.resize(8, 100);
 //	v.resize( 8, 100 );

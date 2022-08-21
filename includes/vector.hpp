@@ -76,11 +76,14 @@ namespace ft {
 		const_reference back() const { return _data[_size - 1]; }
 
 		iterator erase(iterator position) {
-			iterator tmp = position;
-			for (iterator it = position; it != end(); ++it) {
-				it = tmp++;
+			iterator tmp = position + 1;
+			while (tmp != end()) {
+				*position = *tmp;
+				position++;
+				tmp++;
 			}
-			_alloc_.destroy(&back());
+//			_alloc_.destroy(&back());
+			_size--;
 			return position;
 		}
 		void resize(size_type n, value_type val = value_type()) {
