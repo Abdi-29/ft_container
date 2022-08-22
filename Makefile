@@ -6,7 +6,7 @@ INCLUDE = -I ./includes
 OBJ = $(SRC:%.cpp=%.o)
 
 
-CFLAGS = -Wall -std=c++17 #-g -fsanitize=address
+CFLAGS = -Wall -std=c++98
 
 all: build
 
@@ -14,7 +14,7 @@ build:
 	$(MAKE) -j4 $(NAME)
 
 $(NAME): $(OBJ)
-	clang++ $(OBJ) -o $(NAME)
+	clang++ -g -fsanitize=address $(OBJ) -o $(NAME)
 
 %.o: %.cpp
 	clang++ -c  $(INCLUDE) $(CFLAGS) $< -o $@

@@ -28,31 +28,52 @@ void TestCapacity(std::vector<T> v, ft::Vector<T> mine) {
 }
 
 int main(void) {
-	ft::Vector<int> myvector;
-	std::vector<int> v;
+	ft::Vector<int> myvector (3,100);
+	std::vector<int> v(3,100);
 
+//	myvector.assign(7, 100);
+//	v.assign(7, 100);
 	for (size_t i = 0; i < 10; ++i) {
 		myvector.push_back(i);
 		v.push_back(i);
 	}
-	myvector.erase(myvector.begin() + 5);
-	v.erase(v.begin() + 5);
+	ft::Vector<int>::iterator it;
+	std::vector<int>::iterator vit;
+	vit=v.begin() + 5;
+	it = myvector.begin() + 5;
+	myvector.insert(it, 200);
+	v.insert(vit, 200);
+//	std::cout << "size " << myvector.size() << " and " << v.size();
+	for (size_t i = 0; i < myvector.size(); ++i) {
+		std::cout << myvector[i] << " and ori " << v[i] << std::endl;
+	}
+//	vtest.assign(vit, v.end()-1);
+//	test.assign(it, myvector.end()-1);
 
-	// erase the first 3 elements:
-
-	std::cout << "myvector contains:";
-	for (unsigned i=0; i<v.size(); ++i)
-		std::cout << ' ' << myvector[i] << " and " << v[i];
-	std::cout << '\n';
-
-	TestVector(v, myvector);
-	TestCapacity(v, myvector);
-
-	v.resize( 5 );
-	myvector.resize(5);
+//	for (size_t i = 0; i < v.size(); ++i) {
+//		std::cout << v[i] << " and myvector " << myvector[i] << std::endl;
+//	}
+//	std::cout << test.size();
+//	myvector.erase(myvector.begin() + 5);
+//	v.erase(v.begin() + 5);
+//	myvector.erase (myvector.begin(),myvector.begin()+2);
+//	v.erase(v.begin(),v.begin()+2);
 //
-	TestVector(v, myvector);
-	TestCapacity(v, myvector);
+//	// erase the first 3 elements:
+//
+//	std::cout << "myvector contains:";
+//	for (unsigned i=0; i< v.size(); ++i)
+//		std::cout << ' ' << myvector[i] << " and " << v[i];
+//	std::cout << '\n';
+//
+//	TestVector(v, myvector);
+//	TestCapacity(v, myvector);
+//
+//	v.resize( 5 );
+//	myvector.resize(5);
+////
+//	TestVector(v, myvector);
+//	TestCapacity(v, myvector);
 //
 //	mine.resize(8, 100);
 //	v.resize( 8, 100 );

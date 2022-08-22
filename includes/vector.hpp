@@ -12,9 +12,9 @@ namespace ft {
         typedef T value_type;
 		typedef Allocator allocator_type;
 		typedef  typename allocator_type::const_pointer	const_pointer;
-//		typedef Iterator<T> iterator;
+		typedef Iterator<T> iterator;
 		typedef  typename allocator_type::pointer pointer;
-		typedef pointer iterator;
+//		typedef pointer iterator;
 		typedef T& reference;
 		typedef const T& const_reference;
 		typedef const_pointer const_iterator;
@@ -44,6 +44,29 @@ namespace ft {
 			std::cerr << "IM HERE";
 		}
 
+	//MEMBER FUNCTION
+	public:
+		void assign(iterator first, iterator last) {
+			size_type		distance;
+
+			distance = last - first;
+			reserve(distance);
+			while (first != last) {
+				*first = *last;
+				first++;
+			}
+			_size = distance;
+			_capacity = distance;
+		}
+
+		void assign(size_type n, const value_type& val) {
+			reserve(n);
+			for (size_type i = 0; i < n; ++i) {
+				_data[i] = val;
+			}
+			_size = n;
+		}
+
 	public:
 		reference operator[](size_type n) const { return *(_data + n); }
 		reference operator[](size_type n) { return *(_data + n); }
@@ -59,19 +82,45 @@ namespace ft {
 		}
 
 		void reserve (size_type n) {
+			std::cerr << "debugging " << n << std::endl;
 			if (n <= _capacity)
 				return;
 			value_type	*newData;
 			newData = _alloc_.allocate(n);
 			_copy_(newData, 0, size());
-			_alloc_.deallocate(_data, size());
+			_alloc_.deallocate(_data, capacity());
 			_data = newData;
 			_capacity = n;
 		}
 
-		iterator insert (iterator position, const value_type& val) {
+		iterator insert(iterator position, const value_type& val) {
+			if (size() + 1 > capacity()) {
+				reserve(size() + 1);
+			}
+			iterator tmp = position;
+			iterator cy = end();
+			position = end();
+			while (cy != tmp) {
+				cy--;
+				*position = *cy;
+				position--;
+			}
+			*position = val;
+			return position;
+		}
+
+		void insert(iterator position, size_type n, const value_type& val) {
+			size_type i = 0;
+			while (i < n) {
+				position = insert(position, val);
+				position++;
+			}
+		}
+		template <class InputIterator>
+		void insert (iterator position, InputIterator first, InputIterator last) {
 
 		}
+
 		reference back() { return _data[_size - 1]; }
 		const_reference back() const { return _data[_size - 1]; }
 
@@ -82,10 +131,26 @@ namespace ft {
 				position++;
 				tmp++;
 			}
-//			_alloc_.destroy(&back());
+			_alloc_.destroy(&back());
 			_size--;
 			return position;
 		}
+
+		iterator erase(iterator first, iterator last) {
+			size_type distance = last - first;
+
+			while (last != end()) {
+				*first = *last;
+				first++;
+				last++;
+			}
+			_size -= distance;
+			for (size_type i = 0; i < distance; ++i) {
+				_alloc_.destroy(&back());
+			}
+			return first;
+		}
+
 		void resize(size_type n, value_type val = value_type()) {
 			if (n < size()) {
 				_reduce_elements_(n);
