@@ -94,8 +94,16 @@ namespace ft {
 		}
 
 		iterator insert(iterator position, const value_type& val) {
-			if (size() + 1 > capacity()) {
-				reserve(size() + 1);
+			return _fill_insert(position, 1, val);
+		}
+
+		void insert(iterator position, size_type n, const value_type& val) {
+			position = _fill_insert(position, n, val);
+		}
+
+		iterator _fill_insert(iterator position, size_type n, const value_type& val) {
+			if (size() + n > capacity()) {
+				reserve((size() + n) * 2);
 			}
 			iterator tmp = position;
 			iterator cy = end();
@@ -105,20 +113,44 @@ namespace ft {
 				*position = *cy;
 				position--;
 			}
-			*position = val;
+			size_type i = 0;
+			while (i < n) {
+				*position = val;
+				i++;
+			}
+			_size += n;
 			return position;
 		}
 
-		void insert(iterator position, size_type n, const value_type& val) {
-			size_type i = 0;
-			while (i < n) {
-				position = insert(position, val);
-				position++;
+		template <class InputIterator>
+		iterator _fill_insert_range(iterator position, InputIterator first, InputIterator last) {
+			size_type distance = last - first;
+			std::cout << "debugging " << distance << std::endl;
+			iterator test = position;
+			if (distance > capacity()) {
+				reserve(distance * 2);
 			}
+			size_type tmp = end() - position;
+			size_type i = 0;
+			while (first != last) {
+				*position = *first;
+				position++;
+				first++;
+			}
+			std::cout << "IM TESTING " << *test << std::endl;
+			while (i < tmp) {
+				*position = *test;
+				position++;
+				test++;
+				i++;
+			}
+			_size += distance;
+			return position;
 		}
+
 		template <class InputIterator>
 		void insert (iterator position, InputIterator first, InputIterator last) {
-
+			position = _fill_insert_range(position, first, last);
 		}
 
 		reference back() { return _data[_size - 1]; }
