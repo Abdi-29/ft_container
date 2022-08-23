@@ -43,11 +43,11 @@ int main(void) {
 	it = myvector.begin() + 1;
 	myvector.insert(it, 200);
 	v.insert(vit, 200);
-	int myarray [] = { 501,502,503 };
-	myvector.insert (myvector.begin(), myarray, myarray+3);
+	int myarray [] = { 501,502,503 , 504, 405};
+	myvector.insert (myvector.begin(), myarray, myarray+2);
 	v.insert (v.begin(), myarray, myarray+3);
 //	std::cout << "size " << myvector.size() << " and " << v.size();
-	for (size_t i = 0; i < myvector.size(); ++i) {
+	for (size_t i = 0; i < v.size(); ++i) {
 		std::cout << myvector[i] << " and ori " << v[i] << std::endl;
 	}
 //	vtest.assign(vit, v.end()-1);

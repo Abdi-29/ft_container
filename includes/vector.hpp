@@ -4,12 +4,13 @@
 #include <iostream>
 #include "iterator.hpp"
 #include "util.hpp"
+#include "enable_if.hpp"
 
 namespace ft {
 	template < class T, class Allocator = std::allocator<T> >
 	class Vector {
 	public:
-        typedef T value_type;
+		typedef T value_type;
 		typedef Allocator allocator_type;
 		typedef  typename allocator_type::const_pointer	const_pointer;
 		typedef Iterator<T> iterator;
@@ -23,7 +24,7 @@ namespace ft {
 	protected:
 		size_type _size;
 		size_type _capacity;
-        value_type 			*_data;
+		value_type 			*_data;
 		allocator_type		_alloc_;
 
 	public:
@@ -44,7 +45,7 @@ namespace ft {
 			std::cerr << "IM HERE";
 		}
 
-	//MEMBER FUNCTION
+		//MEMBER FUNCTION
 	public:
 		void assign(iterator first, iterator last) {
 			size_type		distance;
@@ -124,32 +125,36 @@ namespace ft {
 
 		template <class InputIterator>
 		iterator _fill_insert_range(iterator position, InputIterator first, InputIterator last) {
-			size_type distance = last - first;
-			std::cout << "debugging " << distance << std::endl;
+			size_type distance = (last - first) + size();
 			iterator test = position;
-			if (distance > capacity()) {
+			iterator tmp = end() - 1;
+			if (distance * 2 > capacity()) {
 				reserve(distance * 2);
+				_size = distance;
 			}
-			size_type tmp = end() - position;
+			position = end() - 1;
+			while (tmp != test) {
+				*position = *tmp;
+				tmp--;
+				position--;
+			}
+			last -= 1;
 			size_type i = 0;
-			while (first != last) {
-				*position = *first;
-				position++;
-				first++;
-			}
-			std::cout << "IM TESTING " << *test << std::endl;
-			while (i < tmp) {
-				*position = *test;
-				position++;
-				test++;
+			while (i < (last - first)) {
+				position--;
+				*position = *last;
+				last--;
 				i++;
 			}
-			_size += distance;
+			position--;
+			std::cout << std::endl;
+			*position = *first;
 			return position;
 		}
 
 		template <class InputIterator>
-		void insert (iterator position, InputIterator first, InputIterator last) {
+		typename enable_if<true>::type
+		insert(iterator position, InputIterator first, InputIterator last) {
 			position = _fill_insert_range(position, first, last);
 		}
 
@@ -210,7 +215,7 @@ namespace ft {
 		const_iterator cend() const { return _data - size();}
 		const_iterator cbegin() const { return _data; }
 
-        //modifiers
+		//modifiers
 		void	_increment_capacity() {
 			if (_capacity == 0) {
 				_capacity = 1;
@@ -219,8 +224,8 @@ namespace ft {
 			}
 		}
 
-    public:
-        void push_back(const value_type& value) {
+	public:
+		void push_back(const value_type& value) {
 			value_type *newData;
 			_increment_capacity();
 			newData = _alloc_.allocate(_size + 1);
@@ -231,7 +236,7 @@ namespace ft {
 			_alloc_.deallocate(_data, _size);
 			_data = newData;
 			_size++;
-        }
+		}
 	};
 }
 #endif

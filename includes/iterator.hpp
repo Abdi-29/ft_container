@@ -46,7 +46,7 @@ namespace ft {
 			_data--;
 			return *this;
 		}
-		Distance operator-(const Iterator<T>& other) { std::cout << "lol\n\n";return this->_data - other._data; }
+		Distance operator-(const Iterator<T>& other) { return this->_data - other._data; }
 		Iterator operator+(const Iterator& other) { return this->_data + other._data; }
 		Iterator operator+=(int) { return operator++(); }
 		Iterator operator+(int a) { return _data + a; }
