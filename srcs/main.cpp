@@ -39,12 +39,13 @@ int main(void) {
 	}
 	ft::Vector<int>::iterator it;
 	std::vector<int>::iterator vit;
-	vit=v.begin() + 1;
-	it = myvector.begin() + 1;
+	vit=v.begin() + 5;
+	it = myvector.begin() + 5;
 	myvector.insert(it, 200);
 	v.insert(vit, 200);
+//	std::cout << "vector size " << v[12] << " " << myvector[12]<< std::endl;
 	int myarray [] = { 501,502,503 , 504, 405};
-	myvector.insert (myvector.begin(), myarray, myarray+2);
+	myvector.insert (myvector.begin(), myarray, myarray+3);
 	v.insert (v.begin(), myarray, myarray+3);
 //	std::cout << "size " << myvector.size() << " and " << v.size();
 	for (size_t i = 0; i < v.size(); ++i) {

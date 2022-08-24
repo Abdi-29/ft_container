@@ -14,7 +14,7 @@ build:
 	$(MAKE) -j4 $(NAME)
 
 $(NAME): $(OBJ)
-	clang++ -g -fsanitize=address $(OBJ) -o $(NAME)
+	clang++ -g  $(OBJ) -o $(NAME)
 
 %.o: %.cpp
 	clang++ -c  $(INCLUDE) $(CFLAGS) $< -o $@

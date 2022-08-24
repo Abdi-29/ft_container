@@ -26,12 +26,14 @@ namespace ft {
 		~Iterator() {}
 
 		Iterator operator++(int) {
+			std::cout << "reached here\n";
 			Iterator tmp(_data);
 			_data++;
 			return tmp;
 		}
 
 		Iterator& operator++() {
+			std::cout << "reached here\n";
 			_data++;
 			return *this;
 		}

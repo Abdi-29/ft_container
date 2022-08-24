@@ -13,12 +13,16 @@ namespace ft {
 		typedef T value_type;
 		typedef Allocator allocator_type;
 		typedef  typename allocator_type::const_pointer	const_pointer;
-		typedef Iterator<T> iterator;
 		typedef  typename allocator_type::pointer pointer;
-//		typedef pointer iterator;
-		typedef T& reference;
-		typedef const T& const_reference;
-		typedef const_pointer const_iterator;
+		typedef  typename allocator_type::reference reference;
+		typedef  typename allocator_type::const_reference const_reference;
+		typedef  typename allocator_type::const_pointer const_iterator;
+		typedef pointer iterator;
+//		typedef const_pointer reverse_iterator;
+//		typedef const pointer const_reverse_iterator;
+//		typedef T& reference;
+//		typedef const T& const_reference;
+//		typedef const_pointer const_iterator;
 		typedef size_t size_type;
 
 	protected:
@@ -41,8 +45,23 @@ namespace ft {
 			}
 		}
 
+		Vector& operator=(const Vector& other) {
+			if (*this == other) {
+				return *this;
+			}
+			assign(begin(), end());
+		}
+
 		~Vector() {
-			std::cerr << "IM HERE";
+			if (!_data) {
+				return;
+			}
+			for (size_type i = 0; i < size(); ++i) {
+				_alloc_.destroy(&back());
+			}
+//			_alloc_.deallocate(_data, capacity());
+			_capacity = 0;
+			_size = 0;
 		}
 
 		//MEMBER FUNCTION
@@ -68,9 +87,77 @@ namespace ft {
 			_size = n;
 		}
 
+		allocator_type get_allocator() const {
+			return _alloc_;
+		}
+
 	public:
 		reference operator[](size_type n) const { return *(_data + n); }
 		reference operator[](size_type n) { return *(_data + n); }
+
+		reference at( size_type pos) {
+			if (pos > size()) {
+				throw std::out_of_range("hello");
+			}
+			return _data[pos];
+		}
+
+		const_reference at( size_type pos ) const {
+			if (pos > size()) {
+				throw std::out_of_range("hello");
+			}
+			return _data[pos];
+		}
+
+		reference front() {
+			return _data[0];
+		}
+
+		const_reference front() const {
+			return _data[0];
+		}
+
+		reference back() {
+			return _data[size() - 1];
+		}
+
+		const_reference back() const {
+			return _data[size() - 1];
+		}
+
+//		reverse_iterator rbegin() {
+//			return end() - 1;
+//		}
+
+//		const_reverse_iterator rbegin() const {
+//			return end() - 1;
+//		}
+
+//		reverse_iterator rend() {
+//			return begin();
+//		}
+//
+//		const_reverse_iterator rend() const {
+//			return begin();
+//		}
+
+
+
+		void clear() {
+			for (size_type i = 0; i < size(); ++i) {
+				_alloc_.destroy(_data[i]);
+			}
+			_size = 0;
+		}
+
+		void pop_back() {
+			_alloc_.destroy(&back());
+			_size--;
+		}
+
+		void swap(Vector& other) {
+			(void)other;
+		}
 		//capacity
 		bool empty() { return size() == 0; }
 		size_type	size() { return _size; }
@@ -83,7 +170,6 @@ namespace ft {
 		}
 
 		void reserve (size_type n) {
-			std::cerr << "debugging " << n << std::endl;
 			if (n <= _capacity)
 				return;
 			value_type	*newData;
@@ -103,20 +189,24 @@ namespace ft {
 		}
 
 		iterator _fill_insert(iterator position, size_type n, const value_type& val) {
+			iterator tmp = position;
+			iterator last = end();
 			if (size() + n > capacity()) {
 				reserve((size() + n) * 2);
 			}
-			iterator tmp = position;
-			iterator cy = end();
-			position = end();
-			while (cy != tmp) {
-				cy--;
-				*position = *cy;
-				position--;
-			}
+			size_type distance = last - tmp;
+			position = end() + n;
 			size_type i = 0;
+			while (i <= distance) {
+				*position = *last;
+				last--;
+				position--;
+				i++;
+			}
+			i = 0;
 			while (i < n) {
 				*position = val;
+				position--;
 				i++;
 			}
 			_size += n;
@@ -125,31 +215,31 @@ namespace ft {
 
 		template <class InputIterator>
 		iterator _fill_insert_range(iterator position, InputIterator first, InputIterator last) {
-			size_type distance = (last - first) + size();
+			size_type distance = (last - first);
 			iterator test = position;
-			iterator tmp = end() - 1;
-			if (distance * 2 > capacity()) {
-				reserve(distance * 2);
-				_size = distance;
+			iterator tmp = end();
+			if (distance + size() > capacity()) {
+				reserve((distance + size()) * 2);
+				_size += distance;
 			}
-			position = end() - 1;
-			while (tmp != test) {
-				*position = *tmp;
-				tmp--;
-				position--;
-			}
-			last -= 1;
+			position = tmp + distance;
 			size_type i = 0;
-			while (i < (last - first)) {
-				position--;
-				*position = *last;
-				last--;
+			size_type end = (position - test) - distance;
+			while (i < end) {
+				*position = *tmp;
 				i++;
+				position--;
+				tmp--;
 			}
-			position--;
-			std::cout << std::endl;
-			*position = *first;
-			return position;
+			*position = *test;
+			position -= distance;
+			while (first != last) {
+				*position = *first;
+				position++;
+				first++;
+			}
+			_size += distance;
+			return test;
 		}
 
 		template <class InputIterator>
@@ -158,8 +248,7 @@ namespace ft {
 			position = _fill_insert_range(position, first, last);
 		}
 
-		reference back() { return _data[_size - 1]; }
-		const_reference back() const { return _data[_size - 1]; }
+//		const_reference back() const { return _data[size() - 1]; }
 
 		iterator erase(iterator position) {
 			iterator tmp = position + 1;
@@ -210,10 +299,21 @@ namespace ft {
 		}
 
 	public:
-		iterator end() { return iterator(&_data[_size]); }
-		iterator begin() { return iterator(_data); }
-		const_iterator cend() const { return _data - size();}
-		const_iterator cbegin() const { return _data; }
+		iterator end() {
+			return _data + size();
+		}
+
+		iterator begin() {
+			return _data;
+		}
+
+		const_iterator cend() const {
+			return _data + size();
+		}
+
+		const_iterator cbegin() const {
+			return _data;
+		}
 
 		//modifiers
 		void	_increment_capacity() {
@@ -226,15 +326,8 @@ namespace ft {
 
 	public:
 		void push_back(const value_type& value) {
-			value_type *newData;
 			_increment_capacity();
-			newData = _alloc_.allocate(_size + 1);
-			for(size_type i = 0; i < _size; i++) {
-				newData[i] = _data[i];
-			}
-			newData[_size] = value;
-			_alloc_.deallocate(_data, _size);
-			_data = newData;
+			_alloc_.construct(end(), value);
 			_size++;
 		}
 	};
