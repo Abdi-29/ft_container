@@ -25,7 +25,7 @@ namespace ft {
 //		typedef const_pointer const_iterator;
 		typedef size_t size_type;
 
-	protected:
+	private:
 		size_type _size;
 		size_type _capacity;
 		value_type 			*_data;
@@ -35,13 +35,13 @@ namespace ft {
 		Vector() : _size(0), _capacity(0), _data(NULL) { }
 
 		Vector(const size_type n) : _size(n), _capacity(n) {
-			_data = _alloc_.allocate(n);
+			_data = _alloc_.allocate(_capacity * sizeof(T));
 		}
 
 		Vector(const size_type n, const T& val) : _size(n), _capacity(n * 2){
-			_data = _alloc_.allocate(n);
+			_data = _alloc_.allocate(_capacity * sizeof(T));
 			for (size_type i = 0; i < n; ++i) {
-				_data[i] = val;
+				_alloc_.construct(end() - i - 1, val);
 			}
 		}
 
@@ -50,6 +50,7 @@ namespace ft {
 				return *this;
 			}
 			assign(begin(), end());
+			return *this;
 		}
 
 		~Vector() {
@@ -57,11 +58,13 @@ namespace ft {
 				return;
 			}
 			for (size_type i = 0; i < size(); ++i) {
-				_alloc_.destroy(&back());
+				_alloc_.destroy(_data + i);
+
 			}
-//			_alloc_.deallocate(_data, capacity());
+			_alloc_.deallocate(_data, capacity());
 			_capacity = 0;
-			_size = 0;
+			std::cout << _data << "\n";
+			_data = NULL;
 		}
 
 		//MEMBER FUNCTION
@@ -160,7 +163,7 @@ namespace ft {
 		}
 		//capacity
 		bool empty() { return size() == 0; }
-		size_type	size() { return _size; }
+		size_type	size() const { return _size; }
 		size_type capacity() const { return _capacity; }
 
 		void _copy_(value_type *newData, size_type start, size_type end) {
@@ -173,7 +176,7 @@ namespace ft {
 			if (n <= _capacity)
 				return;
 			value_type	*newData;
-			newData = _alloc_.allocate(n);
+			newData = _alloc_.allocate(n * sizeof(T));
 			_copy_(newData, 0, size());
 			_alloc_.deallocate(_data, capacity());
 			_data = newData;
@@ -198,14 +201,14 @@ namespace ft {
 			position = end() + n;
 			size_type i = 0;
 			while (i <= distance) {
-				*position = *last;
+				_alloc_.construct(position, *last);
 				last--;
 				position--;
 				i++;
 			}
 			i = 0;
 			while (i < n) {
-				*position = val;
+				_alloc_.construct(position, val);
 				position--;
 				i++;
 			}
@@ -226,15 +229,15 @@ namespace ft {
 			size_type i = 0;
 			size_type end = (position - test) - distance;
 			while (i < end) {
-				*position = *tmp;
+				_alloc_.construct(position, *tmp);
 				i++;
 				position--;
 				tmp--;
 			}
-			*position = *test;
+			_alloc_.construct(position, *test);
 			position -= distance;
 			while (first != last) {
-				*position = *first;
+				_alloc_.construct(position, *first);
 				position++;
 				first++;
 			}
@@ -247,8 +250,6 @@ namespace ft {
 		insert(iterator position, InputIterator first, InputIterator last) {
 			position = _fill_insert_range(position, first, last);
 		}
-
-//		const_reference back() const { return _data[size() - 1]; }
 
 		iterator erase(iterator position) {
 			iterator tmp = position + 1;
@@ -322,6 +323,7 @@ namespace ft {
 			} else if (_size >= _capacity) {
 				_capacity *= 2;
 			}
+			_alloc_.allocate(capacity() * sizeof(T));
 		}
 
 	public:

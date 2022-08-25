@@ -1,56 +1,38 @@
 #include <vector>
 #include "vector.hpp"
+#include "abbassert.hpp"
 
-#define RED  "\x1B[31m"
-#define GREEN  "\x1B[32m"
-#define YELLOW  "\x1B[33m"
-#define RESET  "\x1B[0m"
-
-#define ABBASSERT(message, expr) do { \
-	std::cout << YELLOW << (message) << RESET; \
-	if (expr) { \
-		std::cout << GREEN "pass\n" RESET; \
-	} else { \
-		std::cout << RED "fail\n" RESET; \
-	} \
-} while (0)
-
-template<typename T>
-void TestVector(std::vector<T> v, ft::Vector<T> mine) {
-	ABBASSERT("Vector Size: ", v.size() == mine.size());
-	std::cout << "vector " << v.size() << " and " << mine.size() << "\n";
-}
-
-template<typename T>
-void TestCapacity(std::vector<T> v, ft::Vector<T> mine) {
-	ABBASSERT("Vector Capacity: ", mine.capacity() >= v.capacity());
-	std::cout << "vector " << v.capacity() << " and " << mine.capacity() << "\n";
-}
+void testEmpty(void);
+void testInsert(void);
+void testErase(void);
 
 int main(void) {
-	ft::Vector<int> myvector (3,100);
-	std::vector<int> v(3,100);
-
-//	myvector.assign(7, 100);
-//	v.assign(7, 100);
-	for (size_t i = 0; i < 10; ++i) {
-		myvector.push_back(i);
-		v.push_back(i);
-	}
-	ft::Vector<int>::iterator it;
-	std::vector<int>::iterator vit;
-	vit=v.begin() + 5;
-	it = myvector.begin() + 5;
-	myvector.insert(it, 200);
-	v.insert(vit, 200);
-//	std::cout << "vector size " << v[12] << " " << myvector[12]<< std::endl;
-	int myarray [] = { 501,502,503 , 504, 405};
-	myvector.insert (myvector.begin(), myarray, myarray+3);
-	v.insert (v.begin(), myarray, myarray+3);
+	testEmpty();
+	testErase();
+	testInsert();
+//	ft::Vector<int> myvector (3,100);
+//	std::vector<int> v(3,100);
+//
+////	myvector.assign(7, 100);
+////	v.assign(7, 100);
+//	for (int i = 0; i < 10; ++i) {
+//		myvector.push_back(i);
+//		v.push_back(i);
+//	}
+//	ft::Vector<int>::iterator it;
+//	std::vector<int>::iterator vit;
+//	vit=v.begin() + 5;
+//	it = myvector.begin() + 5;
+//	myvector.insert(it, 200);
+//	v.insert(vit, 200);
+////	std::cout << "vector size " << v[12] << " " << myvector[12]<< std::endl;
+//	int myarray [] = { 501,502,503 , 504, 405};
+//	myvector.insert (myvector.begin(), myarray, myarray+3);
+//	v.insert (v.begin(), myarray, myarray+3);
 //	std::cout << "size " << myvector.size() << " and " << v.size();
-	for (size_t i = 0; i < v.size(); ++i) {
-		std::cout << myvector[i] << " and ori " << v[i] << std::endl;
-	}
+//	for (size_t i = 0; i < v.size(); ++i) {
+//		std::cout << myvector[i] << " and ori " << v[i] << std::endl;
+//	}
 //	vtest.assign(vit, v.end()-1);
 //	test.assign(it, myvector.end()-1);
 
@@ -76,8 +58,7 @@ int main(void) {
 //	v.resize( 5 );
 //	myvector.resize(5);
 ////
-	TestVector(v, myvector);
-	TestCapacity(v, myvector);
+//	TestVector(v, myvector);
 //
 //	mine.resize(8, 100);
 //	v.resize( 8, 100 );
