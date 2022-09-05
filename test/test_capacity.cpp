@@ -1,6 +1,7 @@
 #include "abbassert.hpp"
 #include "vector.hpp"
 #include <vector>
+#include "reverse_iterator.hpp"
 
 template<class T>
 void printContainer(const std::vector<T>& v, const ft::Vector<T>& myvector) {
@@ -60,4 +61,39 @@ void testErase(void) {
 	}
 	ABBASSERT("Vector erase: ", myvector.size() == v.size());
 	printContainer(v, myvector);
+}
+
+template <class T>
+void test(const ft::Vector<T>& a, std::string message) {
+	std::cout << message << " ";
+	for (size_t i = 0; i < a.size(); ++i) {
+		std::cout << a[i] << " ";
+	}
+	std::cout << std::endl;
+}
+void testSwap(void) {
+	ft::Vector<int> myvector(2,100);
+	ft::Vector<int> v(2,200);
+
+	test(myvector, "a");
+	test(v, "b");
+	myvector.swap(v);
+	test(myvector, "a");
+	test(v, "b");
+}
+
+void testData(void) {
+	ft::Vector<int> myvector (5);
+
+	int* p = myvector.data();
+
+	*p = 10;
+	++p;
+	*p = 20;
+	p[2] = 100;
+
+	std::cout << "myvector contains:";
+	for (unsigned i=0; i<myvector.size(); ++i)
+		std::cout << ' ' << myvector[i];
+	std::cout << '\n';
 }

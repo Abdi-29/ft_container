@@ -3,6 +3,7 @@
 
 #include <iostream>
 #include "iterator.hpp"
+#include "reverse_iterator.hpp"
 #include "util.hpp"
 #include "enable_if.hpp"
 
@@ -18,6 +19,7 @@ namespace ft {
 		typedef  typename allocator_type::const_reference const_reference;
 		typedef  typename allocator_type::const_pointer const_iterator;
 		typedef pointer iterator;
+		typedef ft::reverse_iterator<iterator> reverse_iterator;
 //		typedef const_pointer reverse_iterator;
 //		typedef const pointer const_reverse_iterator;
 //		typedef T& reference;
@@ -34,11 +36,14 @@ namespace ft {
 	public:
 		Vector() : _size(0), _capacity(0), _data(NULL) { }
 
-		Vector(const size_type n) : _size(n), _capacity(n) {
+		Vector(const size_type n) : _size(n), _capacity(n * 2) {
 			_data = _alloc_.allocate(_capacity * sizeof(T));
+			for (size_type i = 0; i < n; ++i) {
+				_alloc_.construct(_data + i, 0);
+			}
 		}
 
-		Vector(const size_type n, const T& val) : _size(n), _capacity(n * 2){
+		Vector(const size_type n, const T& val) : _size(n), _capacity(n * 2) {
 			_data = _alloc_.allocate(_capacity * sizeof(T));
 			for (size_type i = 0; i < n; ++i) {
 				_alloc_.construct(end() - i - 1, val);
@@ -46,12 +51,20 @@ namespace ft {
 		}
 
 		Vector& operator=(const Vector& other) {
-			if (*this == other) {
-				return *this;
-			}
-			assign(begin(), end());
+			this->_size = other._size;
+			this->_capacity = other._capacity;
+			this->_data = other._data;
+			this->_alloc_ = other._alloc_;
 			return *this;
 		}
+
+//		Vector& operator==(const Vector& other) {
+//			this->_size = other._size;
+//			this->_capacity = other._capacity;
+//			this->_data = other._data;
+//			this->_alloc_ = other._alloc_;
+//			return *this;
+//		}
 
 		~Vector() {
 			if (!_data) {
@@ -63,7 +76,6 @@ namespace ft {
 			}
 			_alloc_.deallocate(_data, capacity());
 			_capacity = 0;
-			std::cout << _data << "\n";
 			_data = NULL;
 		}
 
@@ -95,6 +107,7 @@ namespace ft {
 		}
 
 	public:
+
 		reference operator[](size_type n) const { return *(_data + n); }
 		reference operator[](size_type n) { return *(_data + n); }
 
@@ -103,6 +116,14 @@ namespace ft {
 				throw std::out_of_range("hello");
 			}
 			return _data[pos];
+		}
+
+		value_type* data() noexcept {
+			return _data;
+		}
+
+		const value_type* data() const noexcept {
+			return _data;
 		}
 
 		const_reference at( size_type pos ) const {
@@ -128,17 +149,17 @@ namespace ft {
 			return _data[size() - 1];
 		}
 
-//		reverse_iterator rbegin() {
-//			return end() - 1;
-//		}
+		reverse_iterator rbegin() {
+			return reverse_iterator(end() - 1);
+		}
 
 //		const_reverse_iterator rbegin() const {
 //			return end() - 1;
 //		}
 
-//		reverse_iterator rend() {
-//			return begin();
-//		}
+		reverse_iterator rend() {
+			return begin();
+		}
 //
 //		const_reverse_iterator rend() const {
 //			return begin();
@@ -159,7 +180,10 @@ namespace ft {
 		}
 
 		void swap(Vector& other) {
-			(void)other;
+			ft::swap(this->_size, other._size);
+			ft::swap(this->_capacity, other._capacity);
+			ft::swap(this->_data, other._data);
+			ft::swap(this->_alloc_, other._alloc_);
 		}
 		//capacity
 		bool empty() { return size() == 0; }
@@ -178,6 +202,9 @@ namespace ft {
 			value_type	*newData;
 			newData = _alloc_.allocate(n * sizeof(T));
 			_copy_(newData, 0, size());
+			for (size_type i = 0; i < size(); ++i) {
+				_alloc_.destroy(_data + i);
+			}
 			_alloc_.deallocate(_data, capacity());
 			_data = newData;
 			_capacity = n;
@@ -301,6 +328,7 @@ namespace ft {
 
 	public:
 		iterator end() {
+			std::cerr << "iterator\n" << size();
 			return _data + size();
 		}
 
@@ -318,18 +346,18 @@ namespace ft {
 
 		//modifiers
 		void	_increment_capacity() {
-			if (_capacity == 0) {
-				_capacity = 1;
-			} else if (_size >= _capacity) {
-				_capacity *= 2;
+			if (_capacity > _size) {
+				return;
 			}
-			_alloc_.allocate(capacity() * sizeof(T));
+			reserve(ft::max(size_type(1), _capacity *= 2));
 		}
 
 	public:
 		void push_back(const value_type& value) {
 			_increment_capacity();
+			std::cerr << "capacity " << _capacity << std::endl;
 			_alloc_.construct(end(), value);
+			std::cerr << "size " << _size << std::endl;
 			_size++;
 		}
 	};
