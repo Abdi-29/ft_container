@@ -118,11 +118,11 @@ namespace ft {
 			return _data[pos];
 		}
 
-		value_type* data() noexcept {
+		value_type* data() {
 			return _data;
 		}
 
-		const value_type* data() const noexcept {
+		const value_type* data() const {
 			return _data;
 		}
 
@@ -200,9 +200,9 @@ namespace ft {
 			if (n <= _capacity)
 				return;
 			value_type	*newData;
-			newData = _alloc_.allocate(n * sizeof(T));
+			newData = _alloc_.allocate(n * sizeof(value_type));
 			_copy_(newData, 0, size());
-			for (size_type i = 0; i < size(); ++i) {
+			for (size_type i = 0; i < _size; ++i) {
 				_alloc_.destroy(_data + i);
 			}
 			_alloc_.deallocate(_data, capacity());
@@ -328,7 +328,6 @@ namespace ft {
 
 	public:
 		iterator end() {
-			std::cerr << "iterator\n" << size();
 			return _data + size();
 		}
 
@@ -349,15 +348,13 @@ namespace ft {
 			if (_capacity > _size) {
 				return;
 			}
-			reserve(ft::max(size_type(1), _capacity *= 2));
+			reserve(ft::max(size_type(1), capacity() * 2));
 		}
 
 	public:
 		void push_back(const value_type& value) {
 			_increment_capacity();
-			std::cerr << "capacity " << _capacity << std::endl;
 			_alloc_.construct(end(), value);
-			std::cerr << "size " << _size << std::endl;
 			_size++;
 		}
 	};

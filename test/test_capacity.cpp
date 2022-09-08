@@ -1,19 +1,11 @@
-#include "abbassert.hpp"
 #include "vector.hpp"
 #include <vector>
-#include "reverse_iterator.hpp"
+#include "catch2.hpp"
 
-template<class T>
-void printContainer(const std::vector<T>& v, const ft::Vector<T>& myvector) {
-	for (size_t i = 0; i < myvector.size(); ++i) {
-		std::cout << "my vector " << myvector[i] << " and " << v[i] << std::endl;
-	}
-}
-
-void testEmpty(void) {
-	std::vector<int> v;
-	ft::Vector<int> myvector;
-	ABBASSERT("Vector empty: ", myvector.empty() == v.empty());
+TEST_CASE("TESTING EMPTY", "EMPTY") {
+    std::vector<int> v;
+    ft::Vector<int> myvector;
+    REQUIRE(v.empty() == myvector.empty());
 }
 
 void testInsert(void) {

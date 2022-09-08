@@ -18,12 +18,14 @@ int main(void) {
 	std::vector<int> v;
 	ft::Vector<int> my;
 
-	for (size_t i = 0; i < 6; ++i) {
+	for (size_t i = 0; i < 5; ++i) {
 		v.push_back(i);
 		my.push_back(i);
 	}
 
-	std::vector<int>::iterator in;
+	std::vector<int>::reverse_iterator in = v.rbegin();
+	ft::Vector<int>::reverse_iterator mine = my.rbegin();
+	std::cout << "rev vec = " << *in << " my " << *mine;
 //	ft::Iterator<std::random_access_iterator_tag, int> it;
 //	ft::reverse_iterator<decltype(nit)> itr(nit);
 //	std::vector<int>::reverse_iterator hi;
