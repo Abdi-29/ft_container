@@ -5,7 +5,6 @@ SRC = 	srcs/main.cpp
 INCLUDE = -I ./includes
 OBJ = $(SRC:%.cpp=%.o)
 
-
 CFLAGS = -Wall -std=c++98 -g
 
 all: build
@@ -17,6 +16,7 @@ $(NAME): $(OBJ)
 	clang++ -g   $(OBJ) -o $(NAME)
 
 %.o: %.cpp
+	@mkdir -p $(dir $@)
 	clang++ -c  $(INCLUDE) $(CFLAGS) $< -o $@
 
 clean:
