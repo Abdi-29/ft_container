@@ -16,4 +16,5 @@ namespace ft {
 		b = tmp;
 	}
 }
+
 #endif

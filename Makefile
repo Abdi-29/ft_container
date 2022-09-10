@@ -1,23 +1,24 @@
-NAME = ft_container
-
-SRC = 	srcs/main.cpp
-
+NAME := ft_container
 INCLUDE = -I ./includes
-OBJ = $(SRC:%.cpp=%.o)
+CXX := clang++
+CFLAGS := -Wall -Wextra -Werror -pedantic -std=c++98
+TFLAGS := -Wall -Werror -Wextra -Wpedantic -std=c++11
+SRCS = main.cpp
 
-CFLAGS = -Wall -std=c++98 -g
+ifdef DEBUG
+	CFLAGS += -g -fsanitize=address
+endif
 
-all: build
-
-build:
-	$(MAKE) -j4 $(NAME)
+OBJ = $($(SRCS):%.cpp=%.o)
+DEP = $(OBJ:.o=.d)
+all: $(NAME)
 
 $(NAME): $(OBJ)
-	clang++ -g   $(OBJ) -o $(NAME)
+	$(CXX) $(CFLAGS) $(OBJ) -o $(NAME)
 
 %.o: %.cpp
 	@mkdir -p $(dir $@)
-	clang++ -c  $(INCLUDE) $(CFLAGS) $< -o $@
+	$(CXX) $(CFLAGS) -c $(INCLUDE) $(CFLAGS) $< -o $@
 
 clean:
 	rm -f $(OBJ)
@@ -25,4 +26,10 @@ clean:
 fclean: clean
 	rm -f $(NAME)
 
-re: fclean all
+TESTFILES := test_capacity.cpp
+
+test:
+	g++ $(TFLAGS) tests/$(TESTFILES) $(INCLUDE) -o catch2 && ./catch2
+
+re: fclean all re clean test
+-include $(DEP)
