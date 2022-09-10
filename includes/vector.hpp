@@ -9,7 +9,7 @@
 
 namespace ft {
 	template < class T, class Allocator = std::allocator<T> >
-	class Vector {
+	class vector {
 	public:
 		typedef T value_type;
 		typedef Allocator allocator_type;
@@ -20,6 +20,7 @@ namespace ft {
 		typedef  typename allocator_type::const_pointer const_iterator;
 		typedef pointer iterator;
 		typedef ft::reverse_iterator<iterator> reverse_iterator;
+		typedef ft::reverse_iterator<const iterator> const_reverse_iterator;
 //		typedef const_pointer reverse_iterator;
 //		typedef const pointer const_reverse_iterator;
 //		typedef T& reference;
@@ -34,23 +35,23 @@ namespace ft {
 		allocator_type		_alloc_;
 
 	public:
-		Vector() : _size(0), _capacity(0), _data(NULL) { }
+		vector() : _size(0), _capacity(0), _data(NULL) { }
 
-		Vector(const size_type n) : _size(n), _capacity(n * 2) {
+		vector(const size_type n) : _size(n), _capacity(n * 2) {
 			_data = _alloc_.allocate(_capacity * sizeof(T));
 			for (size_type i = 0; i < n; ++i) {
 				_alloc_.construct(_data + i, 0);
 			}
 		}
 
-		Vector(const size_type n, const T& val) : _size(n), _capacity(n * 2) {
+		vector(const size_type n, const T& val) : _size(n), _capacity(n * 2) {
 			_data = _alloc_.allocate(_capacity * sizeof(T));
 			for (size_type i = 0; i < n; ++i) {
 				_alloc_.construct(end() - i - 1, val);
 			}
 		}
 
-		Vector& operator=(const Vector& other) {
+		vector& operator=(const vector& other) {
 			this->_size = other._size;
 			this->_capacity = other._capacity;
 			this->_data = other._data;
@@ -66,7 +67,7 @@ namespace ft {
 //			return *this;
 //		}
 
-		~Vector() {
+		~vector() {
 			if (!_data) {
 				return;
 			}
@@ -153,17 +154,17 @@ namespace ft {
 			return reverse_iterator(end() - 1);
 		}
 
-//		const_reverse_iterator rbegin() const {
-//			return end() - 1;
-//		}
+		const_reverse_iterator rbegin() const {
+			return end() - 1;
+		}
 
 		reverse_iterator rend() {
 			return begin();
 		}
 //
-//		const_reverse_iterator rend() const {
-//			return begin();
-//		}
+		const_reverse_iterator rend() const {
+			return begin();
+		}
 
 
 
@@ -179,7 +180,7 @@ namespace ft {
 			_size--;
 		}
 
-		void swap(Vector& other) {
+		void swap(vector& other) {
 			ft::swap(this->_size, other._size);
 			ft::swap(this->_capacity, other._capacity);
 			ft::swap(this->_data, other._data);
