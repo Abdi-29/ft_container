@@ -9,6 +9,7 @@
 #endif
 #include "catch2.hpp"
 #include <algorithm>
+#include <map>
 
 TEST_CASE("testing pair", "[pair]") {
 	ft::vector<ft::pair<int, std::string>> v;
