@@ -25,7 +25,7 @@ namespace ft{
 		typedef typename allocator_type::size_type       size_type;
 		typedef typename allocator_type::difference_type difference_type;
 		//TODO iterator but you need red black tree for it
-		class value_compare: ft::binary_function<value_type, value_type, bool> {
+		class value_compare: std::binary_function<value_type, value_type, bool> {
 		protected:
 			Compare comp;
 		public:

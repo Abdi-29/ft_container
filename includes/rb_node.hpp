@@ -10,9 +10,11 @@ namespace ft {
 	};
 
 	template<class T>
-	class rb_node {
+	struct rb_node {
 	public:
-		typedef T value_type;
+		typedef T value_type; //pair
+		typedef value_type& reference;
+		typedef const T& const_reference;
 		typedef rb_node node_type;
 		typedef node_type* node_pointer;
 		typedef const node_pointer const_node_pointer;
@@ -20,6 +22,7 @@ namespace ft {
 	public:
 		rb_node(): _parent(NULL), _left(NULL), _right(NULL), _value(), _value_colour(RED) {}
 		rb_node(node_pointer parent, value_type value): _parent(parent), _left(NULL), _right(NULL), _value(value), _value_colour(RED) {}
+		rb_node(const_reference value): _parent(NULL), _left(NULL), _right(NULL), _value(value) {}
 		rb_node(const rb_node& rhs) {*this = rhs;}
 		rb_node& operator=(const rb_node& rhs) {
 			if (*this == rhs) {
@@ -33,7 +36,7 @@ namespace ft {
 			return *this;
 		}
 
-	private:
+	public:
 		node_pointer	_parent;
 		node_pointer	_left;
 		node_pointer	_right;

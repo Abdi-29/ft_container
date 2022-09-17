@@ -9,15 +9,13 @@ namespace ft {
 			class T2
 	>
 	struct pair {
-	private:
-		T2 second_type;
-
-	protected:
-		T1 first_type;
 	public:
-		pair() : first_type(), second_type() {}
+		T1 first_type;
+		T2 second_type;
+	public:
+		pair(): first_type(), second_type() {}
 
-		pair(const T1& x, T2& y) : first_type(x), second_type(y) {}
+		pair(const T1& x, const T2& y) : first_type(x), second_type(y) {}
 
 		template<class U1, class U2>
 		pair(const pair<U1, U2> &p) : first_type(p.first_type), second_type(p.second_type) {}
@@ -59,7 +57,7 @@ namespace ft {
 		return !(lhs < rhs);
 	}
 
-	template< class T1, class T2 >
+	template< class T1, class T2>
 	ft::pair<T1,T2> make_pair( T1 t, T2 u) {
 		return ft::pair<T1, T2>(t, u);
 	}

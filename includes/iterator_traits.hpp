@@ -13,7 +13,7 @@ namespace ft {
 		typedef typename Iter::iterator_category iterator_category;
 	};
 
-	template< class T >
+	template<class T >
 	class iterator_traits<T*> {
 	public:
 		typedef std::ptrdiff_t difference_type;
