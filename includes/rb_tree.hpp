@@ -8,22 +8,18 @@
 
 namespace ft {
 	template<
-			class Key,
-			class T,
-			class Compare,
-			class Allocator = std::allocator<T>
+			typename T,
+			typename Compare,
+			typename Allocator = std::allocator<T>
 	> class rb_tree {
 	public:
 		typedef rb_iterator<T> iterator;
 		typedef rb_iterator<const T> const_iterator;
 		typedef ft::reverse_iterator<iterator> reverse_iterator;
 		typedef ft::reverse_iterator<const_iterator> const_reverse_iterator;
-		typedef Allocator allocator_type;
 		typedef Compare value_compare;
-		typedef ft::pair<const Key, T> value_type;
+		typedef T value_type;
 		typedef size_t size_type;
-
-	private:
 		typedef rb_node<T>	node_type;
 		typedef rb_node<const T> const_node_type;
 		typedef typename node_type::node_pointer node_pointer;
@@ -31,8 +27,10 @@ namespace ft {
 		typedef typename Allocator::template rebind<node_type>::other Alloc;
 
 	public:
-		rb_tree(): _root(NULL), _size(0) {
+		rb_tree(): _size(0) {
+			std::cout << "init the pointer\n";
 			_init_nil();
+			_root = TNULL;
 		}
 
 		rb_tree(const value_compare& comp): _root(NULL), _size(0), _compare(comp) {
@@ -56,8 +54,51 @@ namespace ft {
 		 */
 		node_pointer insert(const value_type& value) {
 			node_pointer new_node = new node_type(value);
-			if (_root == TNULL) {
+			if (empty()) {
 				_root = new_node;
+				_root->_value_colour = BLACK;
+			} else {
+				node_pointer search;
+				search = _find_node(_root, new_node);
+				if (search == NULL) {
+					search = node_position_at(_root, new_node);
+					new_node->_parent = search;
+					if (search == NULL) {
+						_root = new_node;
+					} else if(_compare(new_node->_value, search->_value)) {
+						search->_left = new_node;
+					} else {
+						search->_right = new_node;
+					}
+				}
+				insert_fixup(search);
+			}
+			print_node();
+			_size++;
+			return new_node;
+		}
+
+		void print_helper(node_pointer root, std::string indent, bool last) {
+			if (root != NULL) {
+				std::cout << indent;
+				if (last) {
+					std::cout << "R----";
+					indent += "   ";
+				} else {
+					std::cout << "L----";
+					indent += "|  ";
+				}
+
+				std::string sColor = root->_value_colour == false ? "RED" : "BLACK";
+				std::cout << root->_value << "(" << sColor << ")" << std::endl;
+				print_helper(root->_left, indent, false);
+				print_helper(root->_right, indent, true);
+			}
+		}
+
+		void print_node() {
+			if (_root) {
+				print_helper(_root, "", true);
 			}
 		}
 //		iterator insert(iterator hint, const value_type& value) {
@@ -71,15 +112,30 @@ namespace ft {
 			TNULL = new node_type();
 		}
 
-		node_pointer _find_node(const node_pointer root, const value_type& value) {
-			if (!root) {
-				return NULL;
-			} else if(root->_value == value) {
-				return root;
-			} else if(root->_value > value) {
-				_find_node(root->_left, value);
+		node_pointer node_position_at(node_pointer root, node_pointer new_node) {
+			node_pointer end_node;
+
+			end_node = TNULL;
+			while (root != NULL) {
+				end_node = root;
+				if (root->_value > new_node->_value) {
+					root = root->_left;
+				} else {
+					root = root->_right;
+				}
 			}
-			_find_node(root->_right, value);
+			return end_node;
+		}
+
+		node_pointer _find_node(const node_pointer root, const node_pointer new_node) {
+			if (!root) {
+				return root;
+			} else if(root->_value == new_node->_value) {
+				return root;
+			} else if(_compare(root->_value, new_node->_value)) {
+				return _find_node(root->_left, new_node);
+			}
+			return _find_node(root->_right, new_node);
 		}
 
 		node_pointer find(const value_type& value) {

@@ -20,9 +20,12 @@ namespace ft {
 		typedef const node_pointer const_node_pointer;
 
 	public:
-		rb_node(): _parent(NULL), _left(NULL), _right(NULL), _value(), _value_colour(RED) {}
+		rb_node(): _parent(NULL), _left(NULL), _right(NULL), _value(), _value_colour(RED) {
+			std::cout << "node function\n";
+		}
 		rb_node(node_pointer parent, value_type value): _parent(parent), _left(NULL), _right(NULL), _value(value), _value_colour(RED) {}
-		rb_node(const_reference value): _parent(NULL), _left(NULL), _right(NULL), _value(value) {}
+		rb_node(const value_type& value): _parent(NULL), _left(NULL), _right(NULL), _value(value) {}
+		rb_node(node_pointer parent): _parent(parent), _left(NULL), _right(NULL), _value(), _value_colour(RED) {}
 		rb_node(const rb_node& rhs) {*this = rhs;}
 		rb_node& operator=(const rb_node& rhs) {
 			if (*this == rhs) {

@@ -22,9 +22,11 @@ public:
 };
 
 int main(void) {
-	ft::rb_tree<int, int> test;
+	ft::rb_node<int> t;
+	ft::rb_tree<int, std::less<int> > test;
 	int i = 10;
-	ft::pair<int, int> value;
-	value = ft::make_pair(i, i);
-	test.insert(value);
+	test.insert(i);
+//	std::cout << "testing " << test.insert(i)->_value;
+	test.insert(0);
+	test.insert(12);
 }
