@@ -56,12 +56,14 @@ namespace ft {
 				_root->_value_colour = BLACK;
 				return _root;
 			} else {
-				node_pointer exist = _find_node(_root, value);
+				node_pointer exist;
+				exist = _find_node(_root, value);
 				std::cout << "im here\n";
 				if (!exist) {
 					std::cerr << "pointer doesn't exist on the tree\n";
 					node_pointer node = insert_node_at(value);
 					print_node();
+//					return node;
 				} else {
 					std::cout << "hi\n";
 				}
@@ -74,7 +76,7 @@ namespace ft {
 
 			new_node = _alloc.allocate(1);
 			_alloc.construct(new_node, node_type(parent, value));
-			++_size;
+			_size += 1;
 			return new_node;
 		}
 
@@ -87,54 +89,66 @@ namespace ft {
 			new_node->_parent = parent;
 			if (parent == NULL) {
 				_root = new_node;
-			} else if(_compare(new_node->_value->first, parent->_value->first)) {
+			} else if(new_node->_value->first < parent->_value->first) {
 				parent->_left = new_node;
 			} else {
 				parent->_right = new_node;
 			}
+			if (new_node->_parent == NULL) {
+				new_node->_value_colour = RED;
+				std::cout << "ciao sono qui\n";
+				return new_node;
+			}
+			if (new_node->_parent->_parent == NULL) {
+				std::cout << "ciao sonooooo qui\n";
+				return new_node;
+			}
+//			new_node->_left = NULL;
+//			new_node->_right = NULL;
+//			new_node->_value_colour = RED;
+			std::cout << "debuggin: " << new_node->_value->first;
 			insert_fix_up(new_node);
-			std::cout << "DONE!!!!!!!!!!!!!\n";
 			return new_node;
 		}
 
 		void insert_fix_up(node_pointer node) {
-			if (_size <= 3) {
-				return;
-			}
-			node_pointer new_node;
-
-			std::cout << "TESTING ROTATION \n";
 			while (node->_value_colour == RED) {
-				node_pointer uncle;
-				if (node->_parent == node->_parent->_parent->_left) {
-					new_node = node->_parent->_parent->_right;
-					uncle = node->_parent->_right;
+				if (node->_parent == node->_parent->_parent->_right) {
+					fix_right_violation(node);
 				} else {
-					new_node = node->_parent->_parent->_left;
-					uncle = node->_parent->_left;
-				}
-				rb_property(node, new_node, uncle);
-				set_colour(node, new_node);
-				if (node == _root) {
-					break;
+					fix_left_violation(node);
 				}
 			}
 		}
 
-		void rb_property(node_pointer node, node_pointer new_node, node_pointer uncle) {
-			if (new_node->_value_colour == RED) {//case 1
-				std::cout << "CASE 1\n\n";
-				set_colour(node, new_node);
-			} else if(node == uncle) { //case two
-				std::cout << "CASE 2\n\n";
+		void fix_left_violation(node_pointer node) {
+			node_pointer uncle = node->_parent->_parent->_right;
+			if (uncle->_value_colour == RED) {
+				set_colour(node, uncle);
+			}
+			else if(node == node->_parent->_right) {
 				node = node->_parent;
 				left_rotate(node);
 			}
-			std::cout << "CASE 3\n\n";
 			node->_parent->_value_colour = BLACK;//case 3
 			node->_parent->_parent->_value_colour = RED;
 			right_rotate(node->_parent->_parent);
 		}
+
+		void fix_right_violation(node_pointer node) {
+			node_pointer uncle = node->_parent->_parent->_left;
+			if (uncle->_value_colour == RED) {
+				set_colour(node, uncle);
+			}
+			else if(node == node->_parent->_left) {
+				node = node->_parent;
+				right_rotate(node);
+			}
+			node->_parent->_value_colour = BLACK;//case 3
+			node->_parent->_parent->_value_colour = RED;
+			left_rotate(node->_parent->_parent);
+		}
+
 
 		void left_rotate(node_pointer node) {
 			node_pointer tmp = node->_right;
@@ -174,9 +188,9 @@ namespace ft {
 			node->_parent = tmp;
 		}
 
-		void set_colour(node_pointer node, node_pointer new_node) {
+		void set_colour(node_pointer node, node_pointer uncle) {
 			node->_parent->_value_colour = BLACK;
-			new_node->_value_colour = BLACK;
+			uncle->_value_colour = BLACK;
 			node->_parent->_parent->_value_colour = RED;
 			node = node->_parent->_parent;
 		}
@@ -207,9 +221,9 @@ namespace ft {
 //
 //		}
 		//private
-		ft::pair<iterator, bool> _add_to_tree(const value_type& value) {
-
-		}
+//		ft::pair<iterator, bool> _add_to_tree(const value_type& value) {
+//
+//		}
 		void _init_nil() {
 			TNULL = _alloc.allocate(1);
 			_alloc.construct(TNULL, node_type());
@@ -218,7 +232,6 @@ namespace ft {
 		node_pointer node_position_at(node_pointer root, const value_type& value) {
 			node_pointer end_node;
 
-			end_node = NULL;
 			while (root != NULL) {
 				end_node = root;
 				if (root->_value->first > value.first) {
