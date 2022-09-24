@@ -58,16 +58,14 @@ namespace ft {
 			} else {
 				node_pointer exist;
 				exist = _find_node(_root, value);
-				std::cout << "im here\n";
 				if (!exist) {
-					std::cerr << "pointer doesn't exist on the tree\n";
 					node_pointer node = insert_node_at(value);
 					print_node();
-//					return node;
+					return node;
 				} else {
 					std::cout << "hi\n";
 				}
-				return NULL;
+				return exist;
 			}
 		}
 
@@ -94,31 +92,22 @@ namespace ft {
 			} else {
 				parent->_right = new_node;
 			}
-			if (new_node->_parent == NULL) {
-				new_node->_value_colour = RED;
-				std::cout << "ciao sono qui\n";
-				return new_node;
-			}
-			if (new_node->_parent->_parent == NULL) {
-				std::cout << "ciao sonooooo qui\n";
-				return new_node;
-			}
-//			new_node->_left = NULL;
-//			new_node->_right = NULL;
-//			new_node->_value_colour = RED;
-			std::cout << "debuggin: " << new_node->_value->first;
 			insert_fix_up(new_node);
 			return new_node;
 		}
 
 		void insert_fix_up(node_pointer node) {
-			while (node->_value_colour == RED) {
+			while (node->_parent->_value_colour == RED) {
 				if (node->_parent == node->_parent->_parent->_right) {
 					fix_right_violation(node);
 				} else {
 					fix_left_violation(node);
 				}
+				if(node == _root) {
+					break;
+				}
 			}
+			_root->_value_colour = BLACK;
 		}
 
 		void fix_left_violation(node_pointer node) {
@@ -126,13 +115,15 @@ namespace ft {
 			if (uncle->_value_colour == RED) {
 				set_colour(node, uncle);
 			}
-			else if(node == node->_parent->_right) {
-				node = node->_parent;
-				left_rotate(node);
+			else {
+				if(node == node->_parent->_right) {
+					node = node->_parent;
+					left_rotate(node);
+				}
+				node->_parent->_value_colour = BLACK;//case 3
+				node->_parent->_parent->_value_colour = RED;
+				right_rotate(node->_parent->_parent);
 			}
-			node->_parent->_value_colour = BLACK;//case 3
-			node->_parent->_parent->_value_colour = RED;
-			right_rotate(node->_parent->_parent);
 		}
 
 		void fix_right_violation(node_pointer node) {
@@ -140,13 +131,15 @@ namespace ft {
 			if (uncle->_value_colour == RED) {
 				set_colour(node, uncle);
 			}
-			else if(node == node->_parent->_left) {
-				node = node->_parent;
-				right_rotate(node);
+			else {
+				if (node == node->_parent->_left) {
+					node = node->_parent;
+					right_rotate(node);
+				}
+				node->_parent->_value_colour = BLACK;//case 3
+				node->_parent->_parent->_value_colour = RED;
+				left_rotate(node->_parent->_parent);
 			}
-			node->_parent->_value_colour = BLACK;//case 3
-			node->_parent->_parent->_value_colour = RED;
-			left_rotate(node->_parent->_parent);
 		}
 
 
@@ -155,11 +148,11 @@ namespace ft {
 
 			node->_right = tmp->_left;
 			if (tmp->_left != NULL) {
-				tmp->_left = node;
+				tmp->_left->_parent = node;
 			}
 			tmp->_parent = node->_parent;
 			if (node->_parent == NULL) {
-				_root = node;
+				_root = tmp;
 			} else if(node == node->_parent->_left) {
 				node->_parent->_left = tmp;
 			} else {
@@ -174,11 +167,11 @@ namespace ft {
 
 			node->_right = tmp->_right;
 			if (tmp->_right != NULL) {
-				tmp->_right = node;
+				tmp->_right->_parent = node;
 			}
 			tmp->_parent = node->_parent;
 			if (node->_parent == NULL) {
-				_root = node;
+				_root = tmp;
 			} else if(node == node->_parent->_right) {
 				node->_parent->_right = tmp;
 			} else {
@@ -249,10 +242,8 @@ namespace ft {
 			} else if(node->_value->first == value.first) {
 				return node;
 			} else if(_compare(node->_value->first, value.first)) {
-				std::cout << "---------------------11\n";
 				return _find_node(node->_right, value);
 			}
-			std::cout << "---------------------22\n";
 			return _find_node(node->_left, value);
 		}
 
