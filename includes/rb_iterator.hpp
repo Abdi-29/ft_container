@@ -29,6 +29,38 @@ namespace ft {
 		typedef size_t size_type;
 		typedef rb_node<T>* node_pointer;
 		typedef rb_node<const T>* const_node_pointer;
+
+	public:
+		rb_iterator(): _node() {}
+		explicit rb_iterator(node_pointer node): _node(node) {}
+		template<class U>
+		rb_iterator(const rb_iterator<U>& other): _node(other._node) {}
+		rb_iterator& operator=(const rb_iterator& other) {
+			if (this == &other) {
+				return *this;
+			}
+			_node = other._node;
+			return *this;
+		}
+
+		pointer operator->() const {
+			return _node;
+		}
+
+		pointer operator->() {
+			return _node->_value;
+		}
+
+		reference operator*() const {
+			return *_node->_value;
+		}
+
+		reference operator*() {
+			return *_node->_value;
+		}
+
+	private:
+		node_pointer _node;
 	};
 }
 

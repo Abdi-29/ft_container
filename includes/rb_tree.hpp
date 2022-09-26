@@ -5,6 +5,7 @@
 #include "pair.hpp"
 #include "rb_iterator.hpp"
 #include "enable_if.hpp"
+#include "enable_if.hpp"
 
 namespace ft {
 	template<
@@ -50,25 +51,47 @@ namespace ft {
 		 * @param value
 		 * @return
 		 */
-		node_pointer insert(const value_type& value) {
+		ft::pair<iterator, bool> insert(const value_type& value) {
 			if (empty()) {
 				_root = new_leaf(NULL, value);
 				_root->_value_colour = BLACK;
-				return _root;
+				return ft::make_pair(iterator(_root), true);
 			} else {
 				node_pointer exist;
 				exist = _find_node(_root, value);
 				if (!exist) {
 					node_pointer node = insert_node_at(value);
-					print_node();
-					return node;
-				} else {
-					std::cout << "hi\n";
+					return ft::make_pair(iterator(node), true);
 				}
-				return exist;
+				return ft::make_pair(iterator(exist), false);
 			}
 		}
 
+		iterator insert(iterator hint, const value_type& value) {
+			return insert(value).first;
+		}
+
+		template<class InputIt>
+		void insert(InputIt first, InputIt last, typename enable_if<true>::type* = 0) {
+			while (*first != *last) {
+				insert(first);
+				first++;
+			}
+		}
+
+		size_type size() const {
+			return _size;
+		}
+
+		size_type max_size() const {
+			return _alloc.max_size();
+		}
+
+		iterator erase(iterator pos) {
+
+		}
+
+	private:
 		node_pointer new_leaf(node_pointer parent, const value_type& value) {
 			node_pointer new_node;
 
@@ -128,7 +151,7 @@ namespace ft {
 
 		void fix_right_violation(node_pointer node) {
 			node_pointer uncle = node->_parent->_parent->_left;
-			if (uncle->_value_colour == RED) {
+			if (uncle && uncle->_value_colour == RED) {
 				set_colour(node, uncle);
 			}
 			else {
@@ -188,39 +211,6 @@ namespace ft {
 			node = node->_parent->_parent;
 		}
 
-		void print_helper(node_pointer root, std::string indent, bool last) {
-			if (root != NULL) {
-				std::cout << indent;
-				if (last) {
-					std::cout << "R----";
-					indent += "   ";
-				} else {
-					std::cout << "L----";
-					indent += "|  ";
-				}
-				std::string sColor = root->_value_colour == true ? "RED" : "BLACK";
-				std::cout << root->_value->first << "(" << sColor << ")" << std::endl;
-				print_helper(root->_left, indent, false);
-				print_helper(root->_right, indent, true);
-			}
-		}
-
-		void print_node() {
-			if (_root) {
-				print_helper(_root, "", true);
-			}
-		}
-//		iterator insert(iterator hint, const value_type& value) {
-//
-//		}
-		//private
-//		ft::pair<iterator, bool> _add_to_tree(const value_type& value) {
-//
-//		}
-		void _init_nil() {
-			TNULL = _alloc.allocate(1);
-			_alloc.construct(TNULL, node_type());
-		}
 
 		node_pointer node_position_at(node_pointer root, const value_type& value) {
 			node_pointer end_node;
@@ -249,6 +239,30 @@ namespace ft {
 
 		node_pointer find(const value_type& value) {
 			return _find_node(_root, value);
+		}
+
+	public:
+		void print_helper(node_pointer root, std::string indent, bool last) {
+			if (root != NULL) {
+				std::cout << indent;
+				if (last) {
+					std::cout << "R----";
+					indent += "   ";
+				} else {
+					std::cout << "L----";
+					indent += "|  ";
+				}
+				std::string sColor = root->_value_colour == true ? "RED" : "BLACK";
+				std::cout << root->_value->first << "(" << sColor << ")" << std::endl;
+				print_helper(root->_left, indent, false);
+				print_helper(root->_right, indent, true);
+			}
+		}
+
+		void print_node() {
+			if (_root) {
+				print_helper(_root, "", true);
+			}
 		}
 
 	private:

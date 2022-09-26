@@ -26,10 +26,11 @@ int main(void) {
 	ok.first = 12;
 	ok.second = 24;
 	test.insert(ok);
-	test.insert(ft::make_pair(13, 14));
+//	test.insert(ft::make_pair(13, 14));
 	test.insert(ft::make_pair(13, 11));
 	test.insert(ft::make_pair(15, 14));
 	test.insert(ft::make_pair(9, 11));
-//	test.insert(ft::make_pair(15, 14));
+	test.insert(ft::make_pair(15, 14));
+	test.print_node();
 //	std::cout << "testing " << test.insert(i)->_value;
 }
