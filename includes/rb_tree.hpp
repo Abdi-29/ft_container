@@ -68,7 +68,7 @@ namespace ft {
 		}
 
 		iterator insert(iterator hint, const value_type& value) {
-			return insert(value).first;
+			return hint.first == value.first ? hint.first : insert(value).first;
 		}
 
 		template<class InputIt>

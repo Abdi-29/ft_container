@@ -20,7 +20,7 @@ namespace ft {
 	template<class T>
 	class rb_iterator: public ft::Iterator<std::bidirectional_iterator_tag, T> {
 	public:
-		typedef rb_iterator iterator;
+		typedef rb_iterator self;
 		typedef std::bidirectional_iterator_tag iterator_category;
 		typedef T* pointer;
 		typedef T& reference;
@@ -57,6 +57,60 @@ namespace ft {
 
 		reference operator*() {
 			return *_node->_value;
+		}
+
+		self& operator++() {
+			_node = rb_tree_increment(_node);
+			return *this;
+		}
+
+		self operator++(int) {
+			self tmp(*this);
+			_node = rb_tree_increment(_node);
+			return tmp;
+		}
+
+		self& operator--() {
+			_node = rb_tree_decrement(_node);
+		}
+
+	private:
+		node_pointer max_node(node_pointer node) {
+			while (node->_right) {
+				node = node->_right;
+			}
+			return node;
+		}
+
+		node_pointer min_node(node_pointer node) {
+			while (node->_left) {
+				node = node->_left;
+			}
+			return node;
+		}
+
+		node_pointer rb_tree_increment(node_pointer node) {
+			if (node->_right) {
+				return min_node(node->_right);
+			}
+			node_pointer parent = node->_parent;
+			while (parent && node == parent->_right) {
+				node = parent;
+				parent = parent->_parent;
+			}
+			return parent;
+		}
+
+		node_pointer rb_tree_decrement(node_pointer node) {
+			if (node->_left) {
+				return max_node(node->_left);
+			}
+			node_pointer parent = node->_parent;
+			while (parent && node == parent->_left) {
+				node = parent;
+				parent = parent->_parent;
+			}
+			return parent;
 		}
 
 	private:
