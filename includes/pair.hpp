@@ -21,8 +21,10 @@ namespace ft {
 		pair(const pair<U1, U2> &p) : first(p.first), second(p.second) {}
 
 		pair& operator=(const pair& other) {
-			first = other.first;
-			second = other.second;
+			if (this == &other) {
+				first = other.first;
+				second = other.second;
+			}
 			return *this;
 		}
 	};

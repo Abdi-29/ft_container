@@ -20,8 +20,9 @@ public:
 };
 
 int main(void) {
+	typedef ft::rb_tree<ft::pair<int, int>, std::less<int> > tree;
 	ft::rb_node<int> t;
-	ft::rb_tree<ft::pair<const int, int>, std::less<int> > test;
+	tree test;
 	ft::pair<int, int> ok;
 	ok.first = 12;
 	ok.second = 24;
@@ -31,6 +32,16 @@ int main(void) {
 	test.insert(ft::make_pair(15, 14));
 	test.insert(ft::make_pair(9, 11));
 	test.insert(ft::make_pair(15, 14));
-	test.print_node();
+//	ft::rb_iterator<ft::pair<const int, int> > it = test.begin();
+//	std::cout << "iterator = " << it->first;
+//	it++;
+//	std::cout << "  iterator = " << it->first;
+	for (tree::iterator it = test.begin(); it != test.end(); it++) {
+		test.erase(it);
+		break;
+		std::cout << "testing: " << it->first << " ";
+	}
+//	std::cout << "hello\n";
+//	test.print_node();
 //	std::cout << "testing " << test.insert(i)->_value;
 }

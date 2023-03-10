@@ -37,7 +37,7 @@ namespace ft {
 	public:
 		vector() : _size(0), _capacity(0), _data(NULL) { }
 
-		vector(const size_type n) : _size(n), _capacity(n * 2) {
+		explicit vector(const size_type n) : _size(n), _capacity(n * 2) {
 			_data = _alloc_.allocate(_capacity * sizeof(T));
 			for (size_type i = 0; i < n; ++i) {
 				_alloc_.construct(_data + i, 0);
@@ -52,10 +52,13 @@ namespace ft {
 		}
 
 		vector& operator=(const vector& other) {
+            if(this == &other) {
+                return *this;
+            }
 			this->_size = other._size;
 			this->_capacity = other._capacity;
 			this->_data = other._data;
-			this->_alloc_ = other._alloc_;
+			this->_alloc_ = other._alloc_; //double check
 			return *this;
 		}
 
@@ -114,7 +117,7 @@ namespace ft {
 
 		reference at( size_type pos) {
 			if (pos > size()) {
-				throw std::out_of_range("hello");
+				throw std::out_of_range("vector");
 			}
 			return _data[pos];
 		}
@@ -123,13 +126,17 @@ namespace ft {
 			return _data;
 		}
 
+        size_type max_size() const {
+            return _alloc_.max_size();
+        }
+
 		const value_type* data() const {
 			return _data;
 		}
 
 		const_reference at( size_type pos ) const {
 			if (pos > size()) {
-				throw std::out_of_range("hello");
+				throw std::out_of_range("vector");
 			}
 			return _data[pos];
 		}
@@ -225,7 +232,7 @@ namespace ft {
 			if (size() + n > capacity()) {
 				reserve((size() + n) * 2);
 			}
-			size_type distance = last - tmp;
+			size_type distance = last - tmp; //change it as siebe was failed because of that
 			position = end() + n;
 			size_type i = 0;
 			while (i <= distance) {

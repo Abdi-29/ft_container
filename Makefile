@@ -26,7 +26,7 @@ clean:
 fclean: clean
 	rm -f $(NAME)
 
-TESTFILES := test_capacity.cpp
+TESTFILES := vector.cpp
 
 test:
 	g++ $(TFLAGS) tests/$(TESTFILES) $(INCLUDE) -o catch2 && ./catch2

@@ -33,7 +33,7 @@ namespace ft{
 				return comp(lhs.first_type, rhs.first_type);
 			}
 			friend map<Key, T, Compare>;
-			value_compare(Compare c): comp(c) {}
+			explicit value_compare(Compare c): comp(c) {}
 		};
 		/**
 		 * constructors for the map

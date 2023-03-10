@@ -28,14 +28,11 @@ namespace ft {
 		typedef typename Allocator::template rebind<node_type>::other Alloc;
 
 	public:
-		rb_tree(): _size(0) {
+		rb_tree(): _root(NULL), _size(0), _compare() {
 			std::cout << "init the pointer\n";
-			_init_nil();
 		}
 
-		rb_tree(const value_compare& comp): _root(NULL), _size(0), _compare(comp) {
-			_init_nil();
-		}
+		explicit rb_tree(const value_compare& comp): _root(NULL), _size(0), _compare(comp) {}
 
 	public:
 		bool empty() const {
@@ -87,8 +84,24 @@ namespace ft {
 			return _alloc.max_size();
 		}
 
-		iterator erase(iterator pos) {
+		iterator begin() {
+			return iterator(find_first_element(_root));
+		}
 
+		const_iterator begin() const {
+			return const_iterator(find_first_element(_root));
+		}
+
+		iterator end() {
+			return iterator(find_last_element(_root));
+		}
+
+		iterator erase(iterator pos) {
+			node_pointer exist = _find_node(_root, pos.base()->_value);
+			if (exist) {
+				delete_node(exist);
+			}
+			return pos;
 		}
 
 	private:
@@ -96,7 +109,8 @@ namespace ft {
 			node_pointer new_node;
 
 			new_node = _alloc.allocate(1);
-			_alloc.construct(new_node, node_type(parent, value));
+			_alloc.construct(new_node, value);
+			new_node->_parent = parent;
 			_size += 1;
 			return new_node;
 		}
@@ -110,7 +124,7 @@ namespace ft {
 			new_node->_parent = parent;
 			if (parent == NULL) {
 				_root = new_node;
-			} else if(new_node->_value->first < parent->_value->first) {
+			} else if(new_node->_value.first < parent->_value.first) {
 				parent->_left = new_node;
 			} else {
 				parent->_right = new_node;
@@ -165,7 +179,6 @@ namespace ft {
 			}
 		}
 
-
 		void left_rotate(node_pointer node) {
 			node_pointer tmp = node->_right;
 
@@ -217,7 +230,7 @@ namespace ft {
 
 			while (root != NULL) {
 				end_node = root;
-				if (root->_value->first > value.first) {
+				if (root->_value.first > value.first) {
 					root = root->_left;
 				} else {
 					root = root->_right;
@@ -229,9 +242,9 @@ namespace ft {
 		node_pointer _find_node(const node_pointer node, const value_type& value) {
 			if (node == NULL) {
 				return NULL;
-			} else if(node->_value->first == value.first) {
+			} else if(node->_value.first == value.first) {
 				return node;
-			} else if(_compare(node->_value->first, value.first)) {
+			} else if(_compare(node->_value.first, value.first)) {
 				return _find_node(node->_right, value);
 			}
 			return _find_node(node->_left, value);
@@ -239,6 +252,63 @@ namespace ft {
 
 		node_pointer find(const value_type& value) {
 			return _find_node(_root, value);
+		}
+
+		node_pointer find_first_element(node_pointer node) {
+			while (node->_left) {
+				node = node->_left;
+			}
+			return node;
+		}
+
+		node_pointer find_last_element(node_pointer node) {
+			while (node->_right) {
+				node = node->_right;
+			}
+			return node->_right;
+		}
+
+		void transplant(node_pointer node, node_pointer right) {
+			if (!node) {
+				_root = right;
+			} else if (node == node->_parent->_left) {
+				node->_parent->_left = right;
+			} else {
+				node->_parent->_right = right;
+			}
+			right->_parent = node->_parent;
+		}
+
+		void delete_node(node_pointer node) {
+			node_pointer x;
+
+			node_pointer tmp = node;
+			rb_colour original_colour = tmp->_value_colour;
+			if (!node->_left) {
+				x = node->_right;
+				transplant(node, node->_right);
+			} else if (!node->_right) {
+				x = node->_left;
+				transplant(node, node->_left);
+			} else {
+				tmp = find_first_element(node->_right);
+				original_colour = tmp->_value_colour;
+				x = tmp->_right;
+				if (tmp->_parent == node) {
+					x->_parent = tmp;
+				} else {
+					transplant(tmp, tmp->_right);
+					tmp->_right = node->_right;
+					tmp->_right->_parent = tmp;
+				}
+				transplant(node, tmp);
+				tmp->_left = node->_left;
+				tmp->_left->_parent = tmp;
+				tmp->_value_colour = node->_value_colour;
+			}
+			if (original_colour == BLACK) {
+				delete_fix(x);
+			}
 		}
 
 	public:
@@ -253,7 +323,7 @@ namespace ft {
 					indent += "|  ";
 				}
 				std::string sColor = root->_value_colour == true ? "RED" : "BLACK";
-				std::cout << root->_value->first << "(" << sColor << ")" << std::endl;
+				std::cout << root->_value.first << "(" << sColor << ")" << std::endl;
 				print_helper(root->_left, indent, false);
 				print_helper(root->_right, indent, true);
 			}

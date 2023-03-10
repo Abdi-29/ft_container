@@ -67,7 +67,7 @@ namespace ft {
 		reference operator[](size_type n) { return *(_data + n); }
 		pointer operator->() { return _data; }
 		bool operator==(const Iterator& other) { return (this->_data == other._data); }
-		bool operator!=(const Iterator<iterator_category, T> other) {return !(*this == other); }
+		bool operator!=(const Iterator<iterator_category, T>& other) {return !(*this == other); }
 		bool operator>=(const Iterator& other) { return (this->_data >= other._data); }
 		bool operator>(const Iterator& other) { return (this->_data > other._data); }
 		bool operator<=(const Iterator& other) { return (this->_data <= other._data); }

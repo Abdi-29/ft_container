@@ -12,7 +12,7 @@ namespace ft {
 	template<class T, class Allocator = std::allocator<T> >
 	struct rb_node {
 	public:
-		typedef T value_type; //pair
+		typedef T value_type;
 		typedef value_type& reference;
 		typedef const T& const_reference;
 		typedef rb_node node_type;
@@ -22,18 +22,23 @@ namespace ft {
 
 	public:
 		rb_node(): _parent(NULL), _left(NULL), _right(NULL), _value(), _value_colour(RED) {}
-		rb_node(node_pointer parent, value_type value) {
+		rb_node(node_pointer parent, const_reference value) {
 			_parent = parent;
 			_left = NULL;
 			_right = NULL;
-			_value = _alloc_.allocate(1);
-			_alloc_.construct(_value, value);
+			_value = value;
+			std::cout << "reached-----\n";
+			std::cout << _value.first << " second " << value.first;
+//			exit (0);
+//			_value = _alloc_.allocate(1);
+//			_alloc_.construct(_value, value);
 			_value_colour = RED;
 		}
 		rb_node(const value_type& value): _parent(NULL), _left(NULL), _right(NULL), _value(value), _value_colour(RED) {}
 		rb_node(node_pointer parent): _parent(parent), _left(NULL), _right(NULL), _value(), _value_colour(RED) {}
 		rb_node(const rb_node& rhs) {*this = rhs;}
 		rb_node& operator=(const rb_node& rhs) {
+			std::cout << "im hereeeeee\n";
 			if (this == &rhs) {
 				return *this;
 			}
@@ -49,9 +54,9 @@ namespace ft {
 		node_pointer	_parent;
 		node_pointer	_left;
 		node_pointer	_right;
-		value_type		*_value;
+		value_type		_value;
 		rb_colour		_value_colour;
-		allocator_type	_alloc_;
+//		allocator_type	_alloc_;
 	};
 }
 

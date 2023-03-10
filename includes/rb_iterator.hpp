@@ -33,6 +33,9 @@ namespace ft {
 	public:
 		rb_iterator(): _node() {}
 		explicit rb_iterator(node_pointer node): _node(node) {}
+		node_pointer base() const {
+			return _node;
+		}
 		template<class U>
 		rb_iterator(const rb_iterator<U>& other): _node(other._node) {}
 		rb_iterator& operator=(const rb_iterator& other) {
@@ -48,7 +51,7 @@ namespace ft {
 		}
 
 		pointer operator->() {
-			return _node->_value;
+			return &_node->_value;
 		}
 
 		reference operator*() const {
@@ -72,6 +75,21 @@ namespace ft {
 
 		self& operator--() {
 			_node = rb_tree_decrement(_node);
+			return *this;
+		}
+
+		self operator--(int) {
+			self tmp(*this);
+			_node = rb_tree_decrement(_node);
+			return tmp;
+		}
+
+		friend bool operator==(const self& lhs, const self& rhs) {
+			return lhs._node == rhs._node;
+		}
+
+		friend bool operator!=(const self& lhs, const self& rhs) {
+			return lhs._node != rhs._node;
 		}
 
 	private:
