@@ -21,44 +21,51 @@ namespace ft {
 		typedef pointer iterator;
 		typedef ft::reverse_iterator<iterator> reverse_iterator;
 		typedef ft::reverse_iterator<const iterator> const_reverse_iterator;
-//		typedef const_pointer reverse_iterator;
-//		typedef const pointer const_reverse_iterator;
-//		typedef T& reference;
-//		typedef const T& const_reference;
-//		typedef const_pointer const_iterator;
 		typedef size_t size_type;
 
 	private:
-		size_type _size;
-		size_type _capacity;
-		value_type 			*_data;
-		allocator_type		_alloc_;
+		allocator_type	_alloc_;
+		size_type 		_size;
+		size_type 		_capacity;
+		value_type 		*_data;
 
 	public:
 		vector() : _size(0), _capacity(0), _data(NULL) { }
-
-		explicit vector(const size_type n) : _size(n), _capacity(n * 2) {
-			_data = _alloc_.allocate(_capacity * sizeof(T));
-			for (size_type i = 0; i < n; ++i) {
-				_alloc_.construct(_data + i, 0);
+		explicit	vector(const Allocator& alloc): _size(0), _capacity(0), _data(NULL), _alloc_(alloc) {}
+		explicit	vector(const vector& rhs)
+				: _alloc_(rhs.get_allocator(), _size(rhs.size()), _capacity(rhs.size()), _data(_alloc_.allocate(rhs.size()))) {
+			try	{
+				std::uninitialized_copy(rhs.begin(), rhs.end(), begin());
+			}
+			catch(...) {
+				_alloc_.deallocate(_data, capacity());
+				throw;
 			}
 		}
 
-		vector(const size_type n, const T& val) : _size(n), _capacity(n * 2) {
-			_data = _alloc_.allocate(_capacity * sizeof(T));
-			for (size_type i = 0; i < n; ++i) {
-				_alloc_.construct(end() - i - 1, val);
+		explicit vector(size_type n, const T& value = T(), const Allocator& alloc = Allocator())
+				: _alloc_(alloc), _size(n), _capacity(n), _data(_alloc_.allocate(n)) {
+			try {
+				std::uninitialized_fill_n(begin(), n, value);
+			} catch(...) {
+				_alloc_.deallocate(_data, capacity());
+				throw;
 			}
 		}
+
+//		vector(const size_type n, const T& val) : _size(n), _capacity(n * 2) {
+//			_data = _alloc_.allocate(_capacity * sizeof(T));
+//			for (size_type i = 0; i < n; ++i) {
+//				_alloc_.construct(end() - i - 1, val);
+//			}
+//		}
 
 		vector& operator=(const vector& other) {
             if(this == &other) {
                 return *this;
             }
-			this->_size = other._size;
-			this->_capacity = other._capacity;
-			this->_data = other._data;
-			this->_alloc_ = other._alloc_; //double check
+			this->_alloc_ = other.get_allocator(); //double check
+			this->_data = _alloc_.allocate(other.capacity());
 			return *this;
 		}
 
@@ -83,12 +90,9 @@ namespace ft {
 			_data = NULL;
 		}
 
-		//MEMBER FUNCTION
 	public:
 		void assign(iterator first, iterator last) {
-			size_type		distance;
-
-			distance = last - first;
+			size_type		distance = last - first;
 			reserve(distance);
 			while (first != last) {
 				*first = *last;
@@ -116,7 +120,7 @@ namespace ft {
 		reference operator[](size_type n) { return *(_data + n); }
 
 		reference at( size_type pos) {
-			if (pos > size()) {
+			if (pos >= size()) {
 				throw std::out_of_range("vector");
 			}
 			return _data[pos];
