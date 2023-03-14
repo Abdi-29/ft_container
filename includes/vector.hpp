@@ -2,10 +2,14 @@
 #define FT_CONTAINER
 
 #include <iostream>
+#include <iterator>
 #include "iterator.hpp"
 #include "reverse_iterator.hpp"
 #include "util.hpp"
+#include <type_traits>
 #include "enable_if.hpp"
+#include "is_integral.hpp"
+#include "lexicographical_compare.hpp"
 
 namespace ft {
 	template < class T, class Allocator = std::allocator<T> >
@@ -19,8 +23,8 @@ namespace ft {
 		typedef  typename allocator_type::const_reference const_reference;
 		typedef  typename allocator_type::const_pointer const_iterator;
 		typedef pointer iterator;
-		typedef ft::reverse_iterator<iterator> reverse_iterator;
-		typedef ft::reverse_iterator<const iterator> const_reverse_iterator;
+		typedef std::reverse_iterator<iterator> reverse_iterator; //TODO create your own reverse iterator
+		typedef std::reverse_iterator<const iterator> const_reverse_iterator;
 		typedef size_t size_type;
 
 	private:
@@ -31,9 +35,9 @@ namespace ft {
 
 	public:
 		vector() : _size(0), _capacity(0), _data(NULL) { }
-		explicit	vector(const Allocator& alloc): _size(0), _capacity(0), _data(NULL), _alloc_(alloc) {}
+		explicit	vector(const Allocator& alloc): _alloc_(alloc), _size(0), _capacity(0), _data(NULL) {}
 		explicit	vector(const vector& rhs)
-				: _alloc_(rhs.get_allocator(), _size(rhs.size()), _capacity(rhs.size()), _data(_alloc_.allocate(rhs.size()))) {
+				: _alloc_(rhs._alloc_), _size(rhs._size), _capacity(rhs.size()), _data(_alloc_.allocate(rhs.size())) {
 			try	{
 				std::uninitialized_copy(rhs.begin(), rhs.end(), begin());
 			}
@@ -53,12 +57,17 @@ namespace ft {
 			}
 		}
 
-//		vector(const size_type n, const T& val) : _size(n), _capacity(n * 2) {
-//			_data = _alloc_.allocate(_capacity * sizeof(T));
-//			for (size_type i = 0; i < n; ++i) {
-//				_alloc_.construct(end() - i - 1, val);
-//			}
-//		}
+		template< class InputIt, typename std::enable_if<!std::is_integral<InputIt>::value, bool>::type = true>
+		vector( InputIt first, InputIt last,
+				const Allocator& alloc = Allocator())
+				: _alloc_(alloc), _size(0), _capacity(0), _data(NULL) {
+			try {
+				insert(begin(), first, last);
+			} catch(...) {
+				_alloc_.deallocate(_data, capacity());
+				throw;
+			}
+		}
 
 		vector& operator=(const vector& other) {
             if(this == &other) {
@@ -119,7 +128,7 @@ namespace ft {
 		reference operator[](size_type n) const { return *(_data + n); }
 		reference operator[](size_type n) { return *(_data + n); }
 
-		reference at( size_type pos) {
+		reference at(size_type pos) {
 			if (pos >= size()) {
 				throw std::out_of_range("vector");
 			}
@@ -166,22 +175,22 @@ namespace ft {
 		}
 
 		const_reverse_iterator rbegin() const {
-			return end() - 1;
+			return const_reverse_iterator(end() - 1);
 		}
 
 		reverse_iterator rend() {
-			return begin();
+			return reverse_iterator(begin());
 		}
 //
 		const_reverse_iterator rend() const {
-			return begin();
+			return const_reverse_iterator(begin());
 		}
 
 
 
 		void clear() {
 			for (size_type i = 0; i < size(); ++i) {
-				_alloc_.destroy(_data[i]);
+				_alloc_.destroy(&_data[i]);
 			}
 			_size = 0;
 		}
@@ -231,12 +240,11 @@ namespace ft {
 		}
 
 		iterator _fill_insert(iterator position, size_type n, const value_type& val) {
-			iterator tmp = position;
 			iterator last = end();
 			if (size() + n > capacity()) {
 				reserve((size() + n) * 2);
 			}
-			size_type distance = last - tmp; //change it as siebe was failed because of that
+			size_type distance = std::distance(last, position); //change it as siebe was failed because of that
 			position = end() + n;
 			size_type i = 0;
 			while (i <= distance) {
@@ -257,13 +265,13 @@ namespace ft {
 
 		template <class InputIterator>
 		iterator _fill_insert_range(iterator position, InputIterator first, InputIterator last) {
-			size_type distance = (last - first);
+			size_type distance = std::distance(first, last);
 			iterator test = position;
-			iterator tmp = end();
 			if (distance + size() > capacity()) {
 				reserve((distance + size()) * 2);
 				_size += distance;
 			}
+			iterator tmp = end();
 			position = tmp + distance;
 			size_type i = 0;
 			size_type end = (position - test) - distance;
@@ -285,7 +293,7 @@ namespace ft {
 		}
 
 		template <class InputIterator>
-		typename enable_if<true>::type
+		typename std::enable_if<!std::is_integral<InputIterator>::value, void>::type
 		insert(iterator position, InputIterator first, InputIterator last) {
 			position = _fill_insert_range(position, first, last);
 		}
@@ -343,7 +351,15 @@ namespace ft {
 			return _data + size();
 		}
 
+		const_iterator end() const {
+			return _data + size();
+		}
+
 		iterator begin() {
+			return _data;
+		}
+
+		const_iterator begin() const {
 			return _data;
 		}
 
@@ -357,7 +373,7 @@ namespace ft {
 
 		//modifiers
 		void	_increment_capacity() {
-			if (_capacity > _size) {
+			if (_capacity >= _size) {
 				return;
 			}
 			reserve(ft::max(size_type(1), capacity() * 2));
@@ -370,5 +386,33 @@ namespace ft {
 			_size++;
 		}
 	};
+
+	template<typename T, typename Alloc>
+	bool operator<(const vector<T, Alloc>& x, const vector<T, Alloc>& y) {
+		return (lexicographical_compare(x.begin(), x.end(), y.begin(), y.end()));
+	}
+	template<typename T, typename Alloc>
+	bool operator>=(const vector<T, Alloc>& x, const vector<T, Alloc>& y) {
+		return !(x < y);
+	}
+	template<typename T, typename Alloc>
+	bool operator<=(const vector<T, Alloc>& x, const vector<T, Alloc>& y) {
+		return !(x > y);
+	}
+	template<typename T, typename Alloc>
+	bool operator>(const vector<T, Alloc>& x, const vector<T, Alloc>& y) {
+		return !(y < x);
+	}
+	template<typename T, typename Alloc>
+	bool operator==(const vector<T, Alloc>& x, const vector<T, Alloc>& y) {
+		if(x.size() == x.size()) {
+			return std::equal(x.begin(), x.end(), y.begin()); //TODO implement your own eqaul
+		}
+		return false;
+	}
+	template<typename T, typename Alloc>
+	bool operator!=(const vector<T, Alloc>& x, const vector<T, Alloc>& y) {
+		return !(x == y);
+	}
 }
 #endif

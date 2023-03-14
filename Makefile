@@ -10,13 +10,13 @@ ifdef DEBUG
 	CFLAGS += -g -fsanitize=address
 endif
 
-OBJ	=$(addprefix obj/, $(SRC:.cpp=.o))
+OBJ	=$(addprefix obj/, $(SRCS:.cpp=.o))
 OBJ_DIR = obj
 DEP = $(OBJ:.o=.d)
 all: $(NAME)
 
 $(NAME): $(OBJ)
-	$(CXX) $(CFLAGS) $(OBJ) -o $(NAME)
+	$(CXX) $(CFLAGS) $(INCLUDE) $(OBJ) -o $(NAME)
 
 $(OBJ_DIR)/%.o: srcs/%.cpp
 	@mkdir -p $(dir $@)
@@ -33,5 +33,5 @@ TESTFILES := vector.cpp
 test:
 	g++ $(TFLAGS) tests/$(TESTFILES) $(INCLUDE) -o catch2 && ./catch2
 
-re: fclean all re clean test
+re: fclean all
 -include $(DEP)
