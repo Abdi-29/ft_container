@@ -20,7 +20,7 @@ namespace ft {
 	template <> struct is_integral_imp<unsigned int>	: public std::true_type{};
 	template <> struct is_integral_imp<unsigned long>	: public std::true_type{};
 
-	template<typename T> struct is_integral: is_integral_imp<ft::remove_cv<T> > {};
+	template <typename T> struct is_integral: public is_integral_imp<typename remove_cv<T>::type>{};
 }
 
 #endif //IS_INTEGRAL_HPP

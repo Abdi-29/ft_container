@@ -13,6 +13,9 @@ endif
 OBJ	=$(addprefix obj/, $(SRCS:.cpp=.o))
 OBJ_DIR = obj
 DEP = $(OBJ:.o=.d)
+
+fsan:
+	DEBUG=1 make re
 all: $(NAME)
 
 $(NAME): $(OBJ)

@@ -57,9 +57,10 @@ namespace ft {
 			}
 		}
 
-		template< class InputIt, typename std::enable_if<!std::is_integral<InputIt>::value, bool>::type = true>
+		template< class InputIt>
 		vector( InputIt first, InputIt last,
-				const Allocator& alloc = Allocator())
+				const Allocator& alloc = Allocator(),
+		typename ft::enable_if<!ft::is_integral<InputIt>::value, bool>::type = true)
 				: _alloc_(alloc), _size(0), _capacity(0), _data(NULL) {
 			try {
 				insert(begin(), first, last);
@@ -135,17 +136,8 @@ namespace ft {
 			return _data[pos];
 		}
 
-		value_type* data() {
-			return _data;
-		}
-
-        size_type max_size() const {
-            return _alloc_.max_size();
-        }
-
-		const value_type* data() const {
-			return _data;
-		}
+		value_type* data() { return _data; }
+		const value_type* data() const { return _data; }
 
 		const_reference at( size_type pos ) const {
 			if (pos > size()) {
@@ -154,39 +146,14 @@ namespace ft {
 			return _data[pos];
 		}
 
-		reference front() {
-			return _data[0];
-		}
-
-		const_reference front() const {
-			return _data[0];
-		}
-
-		reference back() {
-			return _data[size() - 1];
-		}
-
-		const_reference back() const {
-			return _data[size() - 1];
-		}
-
-		reverse_iterator rbegin() {
-			return reverse_iterator(end() - 1);
-		}
-
-		const_reverse_iterator rbegin() const {
-			return const_reverse_iterator(end() - 1);
-		}
-
-		reverse_iterator rend() {
-			return reverse_iterator(begin());
-		}
-//
-		const_reverse_iterator rend() const {
-			return const_reverse_iterator(begin());
-		}
-
-
+		reference front() { return _data[0]; }
+		const_reference front() const { return _data[0];}
+		reference back() { return _data[size() - 1];}
+		const_reference back() const { return _data[size() - 1];}
+		reverse_iterator rbegin() { return reverse_iterator(end() - 1);}
+		const_reverse_iterator rbegin() const { return const_reverse_iterator(end() - 1);}
+		reverse_iterator rend() { return reverse_iterator(begin());}
+		const_reverse_iterator rend() const { return const_reverse_iterator(begin());}
 
 		void clear() {
 			for (size_type i = 0; i < size(); ++i) {
@@ -209,6 +176,7 @@ namespace ft {
 		//capacity
 		bool empty() { return size() == 0; }
 		size_type	size() const { return _size; }
+		size_type	max_size() const { return _alloc_.max_size(); }
 		size_type capacity() const { return _capacity; }
 
 		void _copy_(value_type *newData, size_type start, size_type end) {
@@ -217,7 +185,10 @@ namespace ft {
 			}
 		}
 
-		void reserve (size_type n) {
+		void reserve(size_type n) {
+			if(n > max_size()) {
+				throw std::length_error("vector");
+			}
 			if (n <= _capacity)
 				return;
 			value_type	*newData;
@@ -244,50 +215,51 @@ namespace ft {
 			if (size() + n > capacity()) {
 				reserve((size() + n) * 2);
 			}
-			size_type distance = std::distance(last, position); //change it as siebe was failed because of that
+			size_type distance = last - position; //change it as siebe was failed because of that
 			position = end() + n;
 			size_type i = 0;
-			while (i <= distance) {
-				_alloc_.construct(position, *last);
-				last--;
+			while (i < distance) {
+				_alloc_.construct(position, *(end() - i - 1));
+//				last--;
 				position--;
 				i++;
 			}
-			i = 0;
-			while (i < n) {
-				_alloc_.construct(position, val);
-				position--;
-				i++;
-			}
+			position--;
+			_alloc_.construct(position, val);
 			_size += n;
 			return position;
 		}
 
 		template <class InputIterator>
 		iterator _fill_insert_range(iterator position, InputIterator first, InputIterator last) {
-			size_type distance = std::distance(first, last);
+		 	size_type distance = std::distance(first, last);
 			iterator test = position;
 			if (distance + size() > capacity()) {
 				reserve((distance + size()) * 2);
-				_size += distance;
 			}
 			iterator tmp = end();
-			position = tmp + distance;
+			position = end() + distance;
 			size_type i = 0;
 			size_type end = (position - test) - distance;
-			while (i < end) {
-				_alloc_.construct(position, *tmp);
-				i++;
-				position--;
-				tmp--;
-			}
-			_alloc_.construct(position, *test);
-			position -= distance;
-			while (first != last) {
-				_alloc_.construct(position, *first);
-				position++;
-				first++;
-			}
+			 if(size() != 0) {
+		 	std::cout << "[DISTANCE = " << end << "]\n";
+
+				while (i < distance) {
+					_alloc_.construct(position, *tmp);
+					i++;
+					position--;
+					tmp--;
+				}
+				_alloc_.construct(position, *test);
+				position -= distance;
+			 }
+			 while (first != last) {
+				 std::cout << "first: " << *first << std::endl;
+				 _alloc_.construct(position, *(last));
+				 position--;
+				 last--;
+			 }
+			 _alloc_.construct(position, *first);
 			_size += distance;
 			return test;
 		}
@@ -373,7 +345,7 @@ namespace ft {
 
 		//modifiers
 		void	_increment_capacity() {
-			if (_capacity >= _size) {
+			if (_capacity > _size) {
 				return;
 			}
 			reserve(ft::max(size_type(1), capacity() * 2));
