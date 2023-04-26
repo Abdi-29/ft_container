@@ -63,6 +63,8 @@ namespace ft {
 		typename ft::enable_if<!ft::is_integral<InputIt>::value, bool>::type = true)
 				: _alloc_(alloc), _size(0), _capacity(0), _data(NULL) {
 			try {
+				typedef typename ft::is_integral<InputIt>::type	Integral;
+				range_alloc(first, last, Integral());
 				insert(begin(), first, last);
 			} catch(...) {
 				_alloc_.deallocate(_data, capacity());
@@ -98,6 +100,13 @@ namespace ft {
 			_alloc_.deallocate(_data, capacity());
 			_capacity = 0;
 			_data = NULL;
+		}
+
+		template<class InputIt>
+		void range_alloc(InputIt first, InputIt last, std::false_type) {
+			_size = std::distance(first, last);
+			_capacity = _size;
+			_data = _alloc_.allocate(size());
 		}
 
 	public:
@@ -230,38 +239,33 @@ namespace ft {
 			return position;
 		}
 
-		template <class InputIterator>
-		iterator _fill_insert_range(iterator position, InputIterator first, InputIterator last) {
-		 	size_type distance = std::distance(first, last);
-			iterator test = position;
-			if (distance + size() > capacity()) {
-				reserve((distance + size()) * 2);
-			}
-			iterator tmp = end();
-			position = end() + distance;
-			size_type i = 0;
-			size_type end = (position - test) - distance;
-			 if(size() != 0) {
-		 	std::cout << "[DISTANCE = " << end << "]\n";
+		void	move_forward(iterator pos, size_type n) {
+			size_type i = end() - pos;
+			size_type index = std::distance(begin(), pos);
 
-				while (i < distance) {
-					_alloc_.construct(position, *tmp);
-					i++;
-					position--;
-					tmp--;
-				}
-				_alloc_.construct(position, *test);
-				position -= distance;
-			 }
-			 while (first != last) {
-				 std::cout << "first: " << *first << std::endl;
-				 _alloc_.construct(position, *(last));
-				 position--;
-				 last--;
-			 }
-			 _alloc_.construct(position, *first);
-			_size += distance;
-			return test;
+			reserve(size() + n);
+			pos = this->begin() + index;
+			while(i) {
+				i--;
+				_alloc_.construct(pos + n + i, *(pos + i));
+				_alloc_.destroy(pos + i);
+			}
+			std::cout << "testing: " << i << " inde: " << index << std::endl;
+		}
+
+		template <class InputIt>
+		iterator _fill_insert_range(iterator pos, InputIt first, InputIt last) {
+			size_type count = std::distance(first, last);
+			size_type index = std::distance(begin(), pos);
+			vector<T, Allocator>	tmp;
+
+			for(; first != last; first++)
+				tmp.push_back(*first);
+			move_forward(pos, count);
+			std::uninitialized_copy(tmp.begin(), tmp.end(), begin() + index);
+//			pos = end();
+			std::cout << "count: " << count << std::endl;
+			exit(0);
 		}
 
 		template <class InputIterator>
